@@ -20,6 +20,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
         const allowedOrigins = [
           'http://localhost:5173',
           'http://127.0.0.1:5173',
+          'https://infinitum-hostel.vercel.app',
           /^http:\/\/192\.168\.\d+\.\d+:5173$/, // 192.168.x.x:5173
           /^http:\/\/10\.\d+\.\d+\.\d+:5173$/,   // 10.x.x.x:5173
           /^http:\/\/172\.\d+\.\d+\.\d+:5173$/,  // 172.x.x.x:5173
