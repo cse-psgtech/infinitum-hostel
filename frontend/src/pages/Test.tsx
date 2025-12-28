@@ -10,7 +10,7 @@ const Test: React.FC = () => {
   });
 
   const testUsers = [
-    { uniqueId: 'INF0001', name: 'Darshan V G' },
+    { uniqueId: 'INF0001', name: 'Darshan' },
     { uniqueId: 'INF5678', name: 'Jane Smith' },
     { uniqueId: 'INF9012', name: 'Bob Johnson' },
     { uniqueId: 'INF3456', name: 'Alice Williams' }
