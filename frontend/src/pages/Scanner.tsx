@@ -49,7 +49,11 @@ const Scanner: React.FC = () => {
       addDebugLog('Successfully joined desk session');
       setConnected(true);
       toast.success('Connected to desk');
-      startScanner();
+      // Add small delay to ensure DOM is ready
+      setTimeout(() => {
+        addDebugLog('Starting scanner after DOM ready');
+        startScanner();
+      }, 500);
     });
 
     // Listen for desk connection status
@@ -63,9 +67,10 @@ const Scanner: React.FC = () => {
       addDebugLog(`Scan acknowledged: ${uniqueId}`);
       setLastScanned(uniqueId);
       toast.success(`Scanned: ${uniqueId}`);
-      // Pause scanning after successful scan
+      // Pause scanning and stop camera after successful scan
       setPaused(true);
-      addDebugLog('Scanner paused - waiting for desk to clear');
+      stopScanner();
+      addDebugLog('Scanner paused and camera stopped - waiting for desk to clear');
       toast('Waiting for desk to clear...', { icon: '⏸️', duration: 3000 });
     });
 
@@ -74,6 +79,8 @@ const Scanner: React.FC = () => {
       addDebugLog('Resume scanning signal received');
       setPaused(false);
       toast.success('Ready to scan next participant');
+      // Restart camera for next scan
+      startScanner();
     });
 
     // Handle errors
@@ -297,20 +304,21 @@ const Scanner: React.FC = () => {
 
           {scanning && (
             <div className="mt-4 text-center">
-              {paused ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-orange-600 font-semibold">⏸️ Scanner Paused</p>
-                  <p className="text-xs text-gray-600">Waiting for desk to clear before next scan</p>
-                </div>
-              ) : (
-                <p className="text-sm text-gray-600">Scanner active - point at QR code</p>
-              )}
+              <p className="text-sm text-gray-600">Scanner active - point at QR code</p>
               <button
                 onClick={stopScanner}
                 className="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
               >
                 Stop Scanner
               </button>
+            </div>
+          )}
+
+          {paused && !scanning && (
+            <div className="mt-4 text-center space-y-2">
+              <p className="text-sm text-orange-600 font-semibold">📷 Camera Off</p>
+              <p className="text-xs text-gray-600">Waiting for desk to clear before next scan</p>
+              <p className="text-xs text-gray-500">Camera will start automatically when ready</p>
             </div>
           )}
 
