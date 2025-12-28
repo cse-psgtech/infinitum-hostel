@@ -186,7 +186,7 @@ const Scanner: React.FC = () => {
         },
         (errorMessage) => {
           // Log scanning errors for debugging
-          //addDebugLog(`QR scan error: ${errorMessage}`);
+          console.log(`QR scan error: ${errorMessage}`);
         }
       );
 
