@@ -52,6 +52,7 @@ const Scanner: React.FC = () => {
       // Add small delay to ensure DOM is ready
       setTimeout(() => {
         addDebugLog('Starting scanner after DOM ready');
+        stopScanner();
         startScanner();
       }, 500);
     });
