@@ -13,8 +13,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/home' },
-    { name: 'Add Rooms', href: '/home/add-rooms' },
-    { name: 'Accommodation Details', href: '/home/accommodation-details' },
+    { name: 'Rooms', href: '/home/add-rooms' },
+    { name: 'Search Members', href: '/home/accommodation-details' },
     { name: 'All Accommodations', href: '/home/all-accommodations' },
   ];
 

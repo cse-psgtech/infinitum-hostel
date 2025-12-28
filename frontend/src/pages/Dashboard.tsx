@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900/90 backdrop-blur-xl relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900/90 backdrop-blur-xl relative overflow-hidden tomorrow-regular">
       {/* Animated background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
@@ -118,7 +118,7 @@ const Dashboard: React.FC = () => {
 
       <div className="relative z-10 p-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400">Hostel Portal</h1>
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 tomorrow-bold">Hostel Portal</h1>
           <p className="text-gray-400 mt-1">Accommodation Statistics Overview</p>
         </div>
 

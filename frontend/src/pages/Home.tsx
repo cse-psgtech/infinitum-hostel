@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 const Home: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    // Ensure dark mode is always active
+    document.documentElement.classList.add('dark');
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">

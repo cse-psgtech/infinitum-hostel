@@ -177,7 +177,7 @@ const AddRooms: React.FC = () => {
   }
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 via-purple-900/20 to-black min-h-screen relative overflow-hidden">
+    <div className="p-6 bg-gradient-to-br from-gray-900 via-purple-900/20 to-black min-h-screen relative overflow-hidden tomorrow-regular">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -192,7 +192,7 @@ const AddRooms: React.FC = () => {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400">Room Management</h1>
+              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 tomorrow-bold">Room Management</h1>
               <p className="text-gray-400 mt-1">Manage and add new rooms to the system</p>
             </div>
             <button
