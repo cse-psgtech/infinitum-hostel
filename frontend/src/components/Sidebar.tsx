@@ -75,7 +75,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                   {isActive && (
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg blur-sm"></div>
                   )}
-                  <span className="relative z-10 mr-3 text-lg">{item.icon}</span>
                   <span className="relative z-10">{item.name}</span>
                 </Link>
               );
