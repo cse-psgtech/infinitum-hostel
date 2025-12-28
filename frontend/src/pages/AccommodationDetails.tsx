@@ -44,7 +44,7 @@ const OtpInput: React.FC<{
           value={value[index] || ''}
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
-          className="w-16 h-16 text-center text-2xl font-bold border-2 border-[rgba(139,92,246,0.5)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] bg-gray-800/50 text-purple-300 backdrop-blur-xl"
+          className="w-16 h-16 text-center text-2xl font-bold border-2 border-[rgba(67,2,105,0.4)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent bg-gray-800/50 text-white"
         />
       ))}
     </div>
@@ -387,31 +387,31 @@ const AccommodationDetails: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-[rgba(67,2,105,0.3)] to-gray-900 relative overflow-hidden tomorrow-regular">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-[rgba(67,2,105,0.3)] to-gray-900 relative overflow-hidden p-6 tomorrow-regular">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-96 h-96 -top-48 -left-48 bg-[rgba(67,2,105,0.15)] rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-[rgba(242,25,97,0.15)] rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
         <div className="absolute w-64 h-64 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[rgba(67,2,105,0.1)] rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
-
+      
       {/* Grid overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(67,2,105,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(67,2,105,0.05)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
-
-      <div className="relative z-10 p-6">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] via-[#ff6b9d] to-[#8b5cf6]">Accommodation Details</h1>
-            <p className="text-gray-300">View and manage guest accommodation information</p>
-          </div>
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(67,2,105,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(67,2,105,0.05)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
+      
+      <div className="relative z-10">
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] via-[#ff6b9d] to-[#8b5cf6] tomorrow-bold">Accommodation Details</h1>
+          <p className="text-gray-300">View and manage guest accommodation information</p>
+        </div>
         
         {/* Scanner Mode Toggle */}
         <button
           onClick={scannerMode ? disableScannerMode : enableScannerMode}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 relative overflow-hidden group ${
+          className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 relative overflow-hidden group ${
             scannerMode
-              ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg shadow-red-500/50'
-              : 'bg-gradient-to-r from-[#430269] to-[#F21961] text-white shadow-lg shadow-purple-500/50'
+              ? 'bg-gradient-to-r from-red-600 to-red-700 hover:shadow-lg hover:shadow-red-500/50 text-white'
+              : 'bg-gradient-to-r from-[#430269] to-[#F21961] hover:shadow-lg hover:shadow-purple-500/50 text-white'
           }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -427,11 +427,11 @@ const AccommodationDetails: React.FC = () => {
 
       {/* Scanner Mode QR Code */}
       {scannerMode && deskSession && (
-        <div className="mb-6 bg-gradient-to-r from-purple-600/30 to-pink-600/30 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[rgba(139,92,246,0.3)]">
+        <div className="mb-6 bg-gradient-to-r from-[#430269] to-[#F21961] rounded-xl p-6 shadow-2xl border border-[rgba(67,2,105,0.3)]">
           <div className="flex items-center justify-between">
             <div className="text-white">
-              <h2 className="text-xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">Scanner Mode Active</h2>
-              <p className="text-purple-200">Scan this QR code with your mobile device</p>
+              <h2 className="text-xl font-bold mb-2">Scanner Mode Active</h2>
+              <p className="text-purple-100">Scan this QR code with your mobile device</p>
               <div className="mt-2 flex items-center space-x-2">
                 <div className={`w-3 h-3 rounded-full ${scannerConnected ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}></div>
                 <span className="text-sm">
@@ -451,14 +451,14 @@ const AccommodationDetails: React.FC = () => {
 
       {/* Tabs */}
       <div className="mb-6">
-        <div className="border-b border-[rgba(139,92,246,0.3)]">
+        <div className="border-b border-[rgba(67,2,105,0.3)]">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('uniqueId')}
               className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                 activeTab === 'uniqueId'
-                  ? 'border-purple-500 text-purple-300'
-                  : 'border-transparent text-gray-400 hover:text-purple-300 hover:border-purple-500/50'
+                  ? 'border-[#F21961] text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d]'
+                  : 'border-transparent text-gray-400 hover:text-purple-300'
               }`}
             >
               Search by Unique ID
@@ -467,8 +467,8 @@ const AccommodationDetails: React.FC = () => {
               onClick={() => setActiveTab('email')}
               className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                 activeTab === 'email'
-                  ? 'border-purple-500 text-purple-300'
-                  : 'border-transparent text-gray-400 hover:text-purple-300 hover:border-purple-500/50'
+                  ? 'border-[#F21961] text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d]'
+                  : 'border-transparent text-gray-400 hover:text-purple-300'
               }`}
             >
               Search by Email
@@ -480,13 +480,13 @@ const AccommodationDetails: React.FC = () => {
       {/* Search Input */}
       <div className="mb-6">
         {activeTab === 'uniqueId' ? (
-          <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[rgba(139,92,246,0.3)]">
+          <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl p-6 shadow-2xl border border-[rgba(67,2,105,0.3)]">
             <div className="flex flex-col items-center space-y-4">
-              <p className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">
+              <p className="text-lg font-semibold text-white">
                 Enter 4-digit Unique ID
               </p>
               <div className="flex items-center space-x-4">
-                <span className="text-2xl font-bold text-purple-300">INF</span>
+                <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d]">INF</span>
                 <OtpInput
                   value={uniqueIdValue}
                   onChange={setUniqueIdValue}
@@ -494,7 +494,7 @@ const AccommodationDetails: React.FC = () => {
                 />
               </div>
               {loading && (
-                <div className="flex items-center space-x-2 text-purple-300">
+                <div className="flex items-center space-x-2 text-purple-400">
                   <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -505,9 +505,9 @@ const AccommodationDetails: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-[rgba(139,92,246,0.3)]">
+          <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl p-6 shadow-2xl border border-[rgba(67,2,105,0.3)]">
             <div className="flex flex-col space-y-4">
-              <label className="block text-sm font-medium text-purple-300">
+              <label className="block text-sm font-medium text-white">
                 Email Address
               </label>
               <div className="flex space-x-4">
@@ -516,15 +516,16 @@ const AccommodationDetails: React.FC = () => {
                   value={emailValue}
                   onChange={(e) => setEmailValue(e.target.value)}
                   placeholder="Enter email address"
-                  className="flex-1 px-3 py-2 border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] backdrop-blur-xl"
+                  className="flex-1 px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
                 />
                 <button
                   onClick={fetchByEmail}
                   disabled={loading}
-                  className="relative px-6 py-2 bg-gradient-to-r from-[#430269] to-[#F21961] text-white rounded-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center shadow-lg shadow-purple-500/50 overflow-hidden group"
-                >
+                  className="relative px-6 py-3 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#430269] to-[#F21961] transition-all duration-300 group-hover:scale-105"></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                  <span className="relative z-10 flex items-center">
+                  <div className="relative flex items-center"
+                >
                   {loading && (
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -532,7 +533,7 @@ const AccommodationDetails: React.FC = () => {
                     </svg>
                   )}
                   Search
-                  </span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -542,18 +543,18 @@ const AccommodationDetails: React.FC = () => {
 
       {/* Accommodation Details Display */}
       {accommodationData && (
-        <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-[rgba(139,92,246,0.3)] overflow-hidden">
+        <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl shadow-2xl border border-[rgba(67,2,105,0.3)] overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600/30 to-pink-600/30 p-6 border-b border-[rgba(139,92,246,0.3)]">
+          <div className="bg-gradient-to-r from-[#430269] to-[#F21961] p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400">{accommodationData.accommodation.name}</h2>
-                <p className="text-purple-200">ID: {accommodationData.accommodation.uniqueId}</p>
+                <h2 className="text-2xl font-bold text-white">{accommodationData.accommodation.name}</h2>
+                <p className="text-purple-100">ID: {accommodationData.accommodation.uniqueId}</p>
               </div>
               <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                 accommodationData.accommodation.payment
-                  ? 'bg-green-500/20 text-green-300 border border-green-500/50'
-                  : 'bg-red-500/20 text-red-300 border border-red-500/50'
+                  ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+                  : 'bg-red-500/20 text-red-300 border border-red-500/30'
               }`}>
                 {accommodationData.accommodation.payment ? 'Paid' : 'Unpaid'}
               </div>
@@ -567,32 +568,32 @@ const AccommodationDetails: React.FC = () => {
               <div className="space-y-6">
                 {/* Personal Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-[rgba(139,92,246,0.3)] pb-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
                     Personal Information
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-purple-300">Email</label>
-                      <p className="text-gray-200">{accommodationData.accommodation.email}</p>
+                      <label className="block text-sm font-medium text-gray-400">Email</label>
+                      <p className="text-white">{accommodationData.accommodation.email}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-purple-300">Phone</label>
-                      <p className="text-gray-200">{accommodationData.accommodation.phone}</p>
+                      <label className="block text-sm font-medium text-gray-400">Phone</label>
+                      <p className="text-white">{accommodationData.accommodation.phone}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-purple-300">Gender</label>
-                      <p className="text-gray-200 capitalize">{accommodationData.accommodation.gender}</p>
+                      <label className="block text-sm font-medium text-gray-400">Gender</label>
+                      <p className="text-white capitalize">{accommodationData.accommodation.gender}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-purple-300">College</label>
-                      <p className="text-gray-200">{accommodationData.accommodation.college}</p>
+                      <label className="block text-sm font-medium text-gray-400">College</label>
+                      <p className="text-white">{accommodationData.accommodation.college}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Meal Preferences */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-[rgba(139,92,246,0.3)] pb-2">
+                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] border-b border-[rgba(67,2,105,0.3)] pb-2">
                     Meal Preferences
                   </h3>
                   <div className="space-y-3">
@@ -601,7 +602,7 @@ const AccommodationDetails: React.FC = () => {
                         type="checkbox"
                         checked={accommodationData.accommodation.breakfast1}
                         readOnly
-                        className="rounded border-purple-500 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-[rgba(67,2,105,0.4)] text-purple-500 focus:ring-purple-500"
                       />
                       <label className="text-sm text-gray-300">Breakfast (Day 1)</label>
                     </div>
@@ -610,7 +611,7 @@ const AccommodationDetails: React.FC = () => {
                         type="checkbox"
                         checked={accommodationData.accommodation.breakfast2}
                         readOnly
-                        className="rounded border-purple-500 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-[rgba(67,2,105,0.4)] text-purple-500 focus:ring-purple-500"
                       />
                       <label className="text-sm text-gray-300">Breakfast (Day 2)</label>
                     </div>
@@ -619,7 +620,7 @@ const AccommodationDetails: React.FC = () => {
                         type="checkbox"
                         checked={accommodationData.accommodation.dinner1}
                         readOnly
-                        className="rounded border-purple-500 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-[rgba(67,2,105,0.4)] text-purple-500 focus:ring-purple-500"
                       />
                       <label className="text-sm text-gray-300">Dinner (Day 1)</label>
                     </div>
@@ -628,7 +629,7 @@ const AccommodationDetails: React.FC = () => {
                         type="checkbox"
                         checked={accommodationData.accommodation.dinner2}
                         readOnly
-                        className="rounded border-purple-500 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-[rgba(67,2,105,0.4)] text-purple-500 focus:ring-purple-500"
                       />
                       <label className="text-sm text-gray-300">Dinner (Day 2)</label>
                     </div>
@@ -637,20 +638,20 @@ const AccommodationDetails: React.FC = () => {
 
                 {/* Amenities & Status */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-[rgba(139,92,246,0.3)] pb-2">
+                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] border-b border-[rgba(67,2,105,0.3)] pb-2">
                     Amenities & Status
                   </h3>
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-purple-300">Amenities</label>
-                      <p className="text-gray-200">{accommodationData.accommodation.amenities}</p>
+                      <label className="block text-sm font-medium text-gray-400">Amenities</label>
+                      <p className="text-white">{accommodationData.accommodation.amenities}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={accommodationData.accommodation.optin}
                         readOnly
-                        className="rounded border-purple-500 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-[rgba(67,2,105,0.4)] text-purple-500 focus:ring-purple-500"
                       />
                       <label className="text-sm text-gray-300">Opt-in for additional services</label>
                     </div>
@@ -659,7 +660,7 @@ const AccommodationDetails: React.FC = () => {
                         type="checkbox"
                         checked={!accommodationData.accommodation.vacated}
                         readOnly
-                        className="rounded border-purple-500 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-[rgba(67,2,105,0.4)] text-purple-500 focus:ring-purple-500"
                       />
                       <label className="text-sm text-gray-300">Currently Occupying</label>
                     </div>
@@ -671,29 +672,29 @@ const AccommodationDetails: React.FC = () => {
               <div className="space-y-6">
                 {/* Payment Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-[rgba(139,92,246,0.3)] pb-2">
+                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] border-b border-[rgba(67,2,105,0.3)] pb-2">
                     Payment Information
                   </h3>
                   <div className="space-y-4">
                     {accommodationData.accommodation.payment ? (
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-sm font-medium text-purple-300">Payment Status</label>
+                          <label className="block text-sm font-medium text-gray-400">Payment Status</label>
                           <div className="flex items-center space-x-3">
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-300 border border-green-500/50">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-300 border border-green-500/30">
                               Paid
                             </span>
                             <button
                               onClick={() => setShowPaymentModal(true)}
-                              className="text-purple-300 hover:text-pink-300 text-sm font-medium underline transition-colors"
+                              className="text-purple-400 hover:text-pink-400 text-sm font-medium underline transition-colors"
                             >
                               Edit Amount
                             </button>
                           </div>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-purple-300">Amount Paid</label>
-                          <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-green-400">
+                          <label className="block text-sm font-medium text-gray-400">Amount Paid</label>
+                          <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-300">
                             {formatCurrency(accommodationData.accommodation.amount)}
                           </p>
                         </div>
@@ -701,13 +702,13 @@ const AccommodationDetails: React.FC = () => {
                     ) : (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-purple-300">Payment Status</label>
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-300 border border-red-500/50">
+                          <label className="block text-sm font-medium text-gray-400">Payment Status</label>
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-300 border border-red-500/30">
                             Unpaid
                           </span>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-purple-300 mb-2">
+                          <label className="block text-sm font-medium text-white mb-2">
                             Enter Payment Amount (₹)
                           </label>
                           <div className="flex space-x-3">
@@ -717,24 +718,23 @@ const AccommodationDetails: React.FC = () => {
                               step="0.01"
                               value={paymentAmount}
                               onChange={(e) => setPaymentAmount(e.target.value)}
-                              className="flex-1 px-3 py-2 border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] backdrop-blur-xl"
+                              className="flex-1 px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
                               placeholder="Enter amount"
                             />
                             <button
                               onClick={updatePayment}
                               disabled={updatingPayment || !paymentAmount}
-                              className="relative px-4 py-2 bg-gradient-to-r from-[#430269] to-[#F21961] text-white rounded-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center shadow-lg shadow-purple-500/50 overflow-hidden group"
+                              className="relative px-4 py-3 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                              <span className="relative z-10 flex items-center">
-                              {updatingPayment && (
+                              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 transition-all duration-300 group-hover:scale-105"></div>
+                              <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
+                              <div className="relative flex items-center">{updatingPayment && (
                                 <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                               )}
-                              {updatingPayment ? 'Updating...' : 'Pay Now'}
-                              </span>
+                              {updatingPayment ? 'Updating...' : 'Pay Now'}</div>
                             </button>
                           </div>
                         </div>
@@ -745,31 +745,31 @@ const AccommodationDetails: React.FC = () => {
 
                 {/* Room Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-[rgba(139,92,246,0.3)] pb-2">
+                  <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] border-b border-[rgba(67,2,105,0.3)] pb-2">
                     Room Information
                   </h3>
                   <div className="space-y-3">
                     {roomData ? (
                       <>
                         <div>
-                          <label className="block text-sm font-medium text-purple-300">Room Name</label>
-                          <p className="text-gray-200">{roomData.room.RoomName}</p>
+                          <label className="block text-sm font-medium text-gray-400">Room Name</label>
+                          <p className="text-white">{roomData.room.RoomName}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-purple-300">Capacity</label>
-                          <p className="text-gray-200">{roomData.room.Capacity}</p>
+                          <label className="block text-sm font-medium text-gray-400">Capacity</label>
+                          <p className="text-white">{roomData.room.Capacity}</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-purple-300">Current Occupancy</label>
-                          <p className="text-gray-200">{roomData.room.currentOccupancy}/{roomData.room.Capacity}</p>
+                          <label className="block text-sm font-medium text-gray-400">Current Occupancy</label>
+                          <p className="text-white">{roomData.room.currentOccupancy}/{roomData.room.Capacity}</p>
                         </div>
                         <div className="pt-2 flex items-center justify-between">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/50">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
                             Room Allocated
                           </span>
                           <button
                             onClick={() => setShowChangeRoomModal(true)}
-                            className="text-purple-300 hover:text-pink-300 text-sm font-medium underline transition-colors"
+                            className="text-purple-400 hover:text-pink-400 text-sm font-medium underline transition-colors"
                           >
                             Change Room
                           </button>
@@ -780,10 +780,11 @@ const AccommodationDetails: React.FC = () => {
                         <p className="text-gray-400">No room allocated</p>
                         <button
                           onClick={() => setShowAllocateModal(true)}
-                          className="relative w-full bg-gradient-to-r from-[#430269] to-[#F21961] text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 shadow-lg shadow-purple-500/50 hover:scale-105 overflow-hidden group"
+                          className="relative w-full overflow-hidden rounded-xl text-white px-4 py-3 font-medium transition-all duration-200 group"
                         >
+                          <div className="absolute inset-0 bg-gradient-to-r from-[#430269] to-[#F21961] transition-all duration-300 group-hover:scale-105"></div>
                           <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                          <span className="relative z-10">Allocate Room</span>
+                          <span className="relative">Allocate Room</span>
                         </button>
                       </div>
                     )}
@@ -793,19 +794,19 @@ const AccommodationDetails: React.FC = () => {
             </div>
 
             {/* Bottom Section - Address Information */}
-            <div className="mt-8 pt-6 border-t border-[rgba(139,92,246,0.3)]">
+            <div className="mt-8 pt-6 border-t border-[rgba(67,2,105,0.3)]">
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-[rgba(139,92,246,0.3)] pb-2">
+                <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] border-b border-[rgba(67,2,105,0.3)] pb-2">
                   Address Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-purple-300">Residential Address</label>
-                    <p className="text-gray-200">{accommodationData.accommodation.residentialAddress}</p>
+                    <label className="block text-sm font-medium text-gray-400">Residential Address</label>
+                    <p className="text-white">{accommodationData.accommodation.residentialAddress}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-purple-300">City</label>
-                    <p className="text-gray-200">{accommodationData.accommodation.city}</p>
+                    <label className="block text-sm font-medium text-gray-400">City</label>
+                    <p className="text-white">{accommodationData.accommodation.city}</p>
                   </div>
                 </div>
               </div>
@@ -816,15 +817,15 @@ const AccommodationDetails: React.FC = () => {
 
       {/* Payment Update Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(139,92,246,0.3)]">
-            <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(67,2,105,0.3)]">
+            <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] mb-4">
               {accommodationData?.accommodation.payment ? 'Edit Payment Amount' : 'Update Payment Status'}
             </h2>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-purple-300 mb-1">
+                <label className="block text-sm font-medium text-white mb-1">
                   Payment Amount (₹)
                 </label>
                 <input
@@ -833,7 +834,7 @@ const AccommodationDetails: React.FC = () => {
                   step="0.01"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-full px-3 py-2 border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] backdrop-blur-xl"
+                  className="w-full px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
                   placeholder="Enter payment amount"
                 />
               </div>
@@ -845,7 +846,7 @@ const AccommodationDetails: React.FC = () => {
                   setShowPaymentModal(false);
                   setPaymentAmount('');
                 }}
-                className="px-4 py-2 text-gray-300 border border-[rgba(139,92,246,0.5)] rounded-xl hover:bg-purple-500/10 transition-colors duration-200"
+                className="px-4 py-2 text-gray-300 border border-[rgba(67,2,105,0.4)] rounded-xl hover:bg-gray-800/50 transition-all duration-200"
                 disabled={updatingPayment}
               >
                 Cancel
@@ -853,18 +854,17 @@ const AccommodationDetails: React.FC = () => {
               <button
                 onClick={updatePayment}
                 disabled={updatingPayment}
-                className="relative px-4 py-2 bg-gradient-to-r from-[#430269] to-[#F21961] text-white rounded-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center shadow-lg shadow-purple-500/50 overflow-hidden group"
+                className="relative px-4 py-2 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                <span className="relative z-10 flex items-center">
-                {updatingPayment && (
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 transition-all duration-300 group-hover:scale-105"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
+                <div className="relative flex items-center">{updatingPayment && (
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 )}
-                {updatingPayment ? 'Updating...' : (accommodationData?.accommodation.payment ? 'Update Amount' : 'Mark as Paid')}
-                </span>
+                {updatingPayment ? 'Updating...' : (accommodationData?.accommodation.payment ? 'Update Amount' : 'Mark as Paid')}</div>
               </button>
             </div>
           </div>
@@ -873,14 +873,14 @@ const AccommodationDetails: React.FC = () => {
 
       {/* Change Room Modal */}
       {showChangeRoomModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(139,92,246,0.3)]">
-            <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-4">Change Room</h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(67,2,105,0.3)]">
+            <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] mb-4">Change Room</h2>
 
             <div className="space-y-4">
               {/* Room Search */}
               <div>
-                <label className="block text-sm font-medium text-purple-300 mb-1">
+                <label className="block text-sm font-medium text-white mb-1">
                   Search Rooms
                 </label>
                 <input
@@ -888,16 +888,16 @@ const AccommodationDetails: React.FC = () => {
                   value={roomSearchTerm}
                   onChange={(e) => setRoomSearchTerm(e.target.value)}
                   placeholder="Search by room name..."
-                  className="w-full px-3 py-2 border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] backdrop-blur-xl"
+                  className="w-full px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
                 />
               </div>
 
               {/* Room Selection */}
               <div>
-                <label className="block text-sm font-medium text-purple-300 mb-1">
+                <label className="block text-sm font-medium text-white mb-1">
                   Select New Room
                 </label>
-                <div className="max-h-48 overflow-y-auto border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/30">
+                <div className="max-h-48 overflow-y-auto border border-[rgba(67,2,105,0.4)] rounded-xl bg-gray-800/30">
                   {availableRooms
                     .filter(room => 
                       room.RoomName.toLowerCase().includes(roomSearchTerm.toLowerCase()) &&
@@ -907,19 +907,19 @@ const AccommodationDetails: React.FC = () => {
                       <div
                         key={room._id}
                         onClick={() => setSelectedRoom(room)}
-                        className={`p-3 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                          selectedRoom?._id === room._id ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-500' : ''
+                        className={`p-3 cursor-pointer border-b border-[rgba(67,2,105,0.2)] last:border-b-0 hover:bg-purple-500/10 transition-colors ${
+                          selectedRoom?._id === room._id ? 'bg-purple-500/20 border-purple-500/50' : ''
                         }`}
                       >
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="font-medium text-gray-900 dark:text-white">{room.RoomName}</p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="font-medium text-white">{room.RoomName}</p>
+                            <p className="text-sm text-gray-400">
                               Capacity: {room.Capacity} | Occupied: {room.members.length}
                             </p>
                           </div>
                           {room.members.length >= room.Capacity && (
-                            <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                            <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded border border-red-500/30">
                               Full
                             </span>
                           )}
@@ -945,7 +945,7 @@ const AccommodationDetails: React.FC = () => {
                   setSelectedRoom(null);
                   setRoomSearchTerm('');
                 }}
-                className="px-4 py-2 text-gray-300 border border-[rgba(139,92,246,0.5)] rounded-xl hover:bg-purple-500/10 transition-colors duration-200"
+                className="px-4 py-2 text-gray-300 border border-[rgba(67,2,105,0.4)] rounded-xl hover:bg-gray-800/50 transition-all duration-200"
                 disabled={changingRoom}
               >
                 Cancel
@@ -953,18 +953,17 @@ const AccommodationDetails: React.FC = () => {
               <button
                 onClick={changeRoom}
                 disabled={changingRoom || !selectedRoom}
-                className="relative px-4 py-2 bg-gradient-to-r from-[#430269] to-[#F21961] text-white rounded-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center shadow-lg shadow-purple-500/50 overflow-hidden group"
+                className="relative px-4 py-2 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                <span className="relative z-10 flex items-center">
-                {changingRoom && (
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-700 transition-all duration-300 group-hover:scale-105"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-700 to-orange-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
+                <div className="relative flex items-center">{changingRoom && (
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 )}
-                {changingRoom ? 'Changing...' : 'Change Room'}
-                </span>
+                {changingRoom ? 'Changing...' : 'Change Room'}</div>
               </button>
             </div>
           </div>
@@ -973,14 +972,14 @@ const AccommodationDetails: React.FC = () => {
 
       {/* Allocate Room Modal */}
       {showAllocateModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900/90 backdrop-blur-xl rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(139,92,246,0.3)]">
-            <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-4">Allocate Room</h2>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(67,2,105,0.3)]">
+            <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] mb-4">Allocate Room</h2>
 
             <div className="space-y-4">
               {/* Room Search */}
               <div>
-                <label className="block text-sm font-medium text-purple-300 mb-1">
+                <label className="block text-sm font-medium text-white mb-1">
                   Search Rooms
                 </label>
                 <input
@@ -988,16 +987,16 @@ const AccommodationDetails: React.FC = () => {
                   value={roomSearchTerm}
                   onChange={(e) => setRoomSearchTerm(e.target.value)}
                   placeholder="Search by room name..."
-                  className="w-full px-3 py-2 border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-[#8b5cf6] focus:border-[#8b5cf6] backdrop-blur-xl"
+                  className="w-full px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
                 />
               </div>
 
               {/* Room Selection */}
               <div>
-                <label className="block text-sm font-medium text-purple-300 mb-1">
+                <label className="block text-sm font-medium text-white mb-1">
                   Select Room
                 </label>
-                <div className="max-h-48 overflow-y-auto border border-[rgba(139,92,246,0.5)] rounded-xl bg-gray-800/30">
+                <div className="max-h-48 overflow-y-auto border border-[rgba(67,2,105,0.4)] rounded-xl bg-gray-800/30">
                   {availableRooms
                     .filter(room => 
                       room.RoomName.toLowerCase().includes(roomSearchTerm.toLowerCase())
@@ -1006,19 +1005,19 @@ const AccommodationDetails: React.FC = () => {
                       <div
                         key={room._id}
                         onClick={() => setSelectedRoom(room)}
-                        className={`p-3 cursor-pointer border-b border-[rgba(139,92,246,0.3)] last:border-b-0 hover:bg-purple-500/10 transition-colors ${
-                          selectedRoom?._id === room._id ? 'bg-purple-600/20 border-purple-500' : ''
+                        className={`p-3 cursor-pointer border-b border-[rgba(67,2,105,0.2)] last:border-b-0 hover:bg-purple-500/10 transition-colors ${
+                          selectedRoom?._id === room._id ? 'bg-purple-500/20 border-purple-500/50' : ''
                         }`}
                       >
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="font-medium text-gray-200">{room.RoomName}</p>
-                            <p className="text-sm text-purple-300">
+                            <p className="font-medium text-white">{room.RoomName}</p>
+                            <p className="text-sm text-gray-400">
                               Capacity: {room.Capacity} | Occupied: {room.members.length}
                             </p>
                           </div>
                           {room.members.length >= room.Capacity && (
-                            <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded border border-red-500/50">
+                            <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded border border-red-500/30">
                               Full
                             </span>
                           )}
@@ -1043,7 +1042,7 @@ const AccommodationDetails: React.FC = () => {
                   setSelectedRoom(null);
                   setRoomSearchTerm('');
                 }}
-                className="px-4 py-2 text-gray-300 border border-[rgba(139,92,246,0.5)] rounded-xl hover:bg-purple-500/10 transition-colors duration-200"
+                className="px-4 py-2 text-gray-300 border border-[rgba(67,2,105,0.4)] rounded-xl hover:bg-gray-800/50 transition-all duration-200"
                 disabled={allocatingRoom}
               >
                 Cancel
@@ -1051,18 +1050,17 @@ const AccommodationDetails: React.FC = () => {
               <button
                 onClick={allocateRoom}
                 disabled={allocatingRoom || !selectedRoom}
-                className="relative px-4 py-2 bg-gradient-to-r from-[#430269] to-[#F21961] text-white rounded-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center shadow-lg shadow-purple-500/50 overflow-hidden group"
+                className="relative px-4 py-2 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                <span className="relative z-10 flex items-center">
-                {allocatingRoom && (
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 transition-all duration-300 group-hover:scale-105"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
+                <div className="relative flex items-center">{allocatingRoom && (
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                 )}
-                {allocatingRoom ? 'Allocating...' : 'Allocate Room'}
-                </span>
+                {allocatingRoom ? 'Allocating...' : 'Allocate Room'}</div>
               </button>
             </div>
           </div>
@@ -1071,17 +1069,17 @@ const AccommodationDetails: React.FC = () => {
 
       {/* No Data State */}
       {!accommodationData && !loading && (
-        <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl shadow-2xl border border-[rgba(139,92,246,0.3)] p-6">
+        <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl shadow-2xl border border-[rgba(67,2,105,0.3)] p-6">
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[rgba(139,92,246,0.3)]">
-              <svg className="w-8 h-8 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[rgba(67,2,105,0.3)]">
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 mb-2">
+            <h3 className="text-lg font-medium text-white mb-2">
               {activeTab === 'uniqueId' ? 'Enter a Unique ID' : 'Search for Accommodation'}
             </h3>
-            <p className="text-gray-300">
+            <p className="text-gray-400">
               {activeTab === 'uniqueId'
                 ? 'Enter the 4-digit unique ID to view accommodation details'
                 : 'Enter an email address and click search to view accommodation details'
