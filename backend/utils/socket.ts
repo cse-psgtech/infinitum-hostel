@@ -1,7 +1,9 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HTTPServer } from 'http';
 import { validateDeskSession } from '../controllers/desk.controller';
+import dotenv from 'dotenv';
 
+dotenv.config();
 interface DeskRoom {
   deskClient: Socket | null;
   scannerClient: Socket | null;
@@ -19,7 +21,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
         // Allow localhost and local network IPs
         const allowedOrigins = [
           'http://localhost:5173',
-          'http://127.0.0.1:5173',
+          `${process.env.FRONTEND_URL} || http://127.0.0.1:5173`,
           'https://infinitum-hostel.vercel.app',
           /^http:\/\/192\.168\.\d+\.\d+:5173$/, // 192.168.x.x:5173
           /^http:\/\/10\.\d+\.\d+\.\d+:5173$/,   // 10.x.x.x:5173
