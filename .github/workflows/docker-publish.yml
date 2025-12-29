@@ -117,4 +117,12 @@ jobs:
             VITE_USERNAME=${{ secrets.VITE_USERNAME }}
             VITE_PASSWORD=${{ secrets.VITE_PASSWORD }}
             VITE_API_BASE=${{ secrets.VITE_API_BASE }}
+      - name: Call webhook after successful push
+        if: success()
+        run: |
+          curl --insecure ${{ secrets.WEBHOOK_URL_BACKEND }}
+      - name: Call webhook after successful push
+        if: success()
+        run: |
+          curl --insecure ${{ secrets.WEBHOOK_URL_FRONTEND }}
 
