@@ -103,13 +103,13 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.send('Hotel server is running');
 });
-app.get('/api/acc', (req, res) => {
+app.get('/inf/api/acc', (req, res) => {
   res.send('Hotel server is running with /api/acc');
 });
 
-app.use('/api/acc/rooms', roomRoutes);
-app.use('/api/acc/accommodation', accommodationRoutes);
-app.use('/api/acc/desk', deskRoutes);
+app.use('/inf/api/acc/rooms', roomRoutes);
+app.use('/inf/api/acc/accommodation', accommodationRoutes);
+app.use('/inf/api/acc/desk', deskRoutes);
 
 // Start server
 httpServer.listen(PORT, () => {
