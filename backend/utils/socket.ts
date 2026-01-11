@@ -17,7 +17,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        
+         
         // Allow localhost and local network IPs
         const allowedOrigins = [
           'http://localhost:5173',
@@ -136,7 +136,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       }
 
       // Forward to desk client
-      room.deskClient.emit('participant-scanned', { uniqueId });
+      room.deskClient.emit('scan-acknowledged', { uniqueId });
       
       // Acknowledge scanner
       socket.emit('scan-acknowledged', { uniqueId });

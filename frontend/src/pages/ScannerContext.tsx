@@ -12,6 +12,8 @@ interface ScannerContextType {
   socket: Socket | null;
   enableScannerMode: () => Promise<void>;
   disableScannerMode: () => void;
+  uniqueIdValue: string;
+  setUniqueIdValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ScannerContext = createContext<ScannerContextType | null>(null);
@@ -20,6 +22,7 @@ export const ScannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [scannerMode, setScannerMode] = useState(false);
   const [deskSession, setDeskSession] = useState<DeskSession>(null);
   const [scannerConnected, setScannerConnected] = useState(false);
+  const [uniqueIdValue, setUniqueIdValue] = useState('');
   const socketRef = useRef<Socket | null>(null);
 
   
@@ -38,6 +41,14 @@ export const ScannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setScannerConnected(false);
       toast("Mobile scanner disconnected", { icon: "⚠️" });
     });
+    
+    // Listen for scanned participant IDs
+      socket.off("scan-acknowledged").on("scan-acknowledged", ({ uniqueId }: { uniqueId: string }) => {
+        const fourDigit = uniqueId.replace('INF', '');
+        setUniqueIdValue(fourDigit);
+        toast.success(`Scanned: ${uniqueId}`);
+        });
+
     socket.off("error").on("error", ({ message }: { message: string }) => toast.error(message));
   };
 
@@ -101,6 +112,8 @@ export const ScannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         socket: socketRef.current,
         enableScannerMode,
         disableScannerMode,
+        uniqueIdValue,
+        setUniqueIdValue
       }}
     >
       {children}
