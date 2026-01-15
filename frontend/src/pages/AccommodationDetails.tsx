@@ -88,7 +88,6 @@ const AccommodationDetails: React.FC = () => {
   
 
   const [activeTab, setActiveTab] = useState<'uniqueId' | 'email'>('uniqueId');
-  const [uniqueIdValue, setUniqueIdValue] = useState('');
   const [emailValue, setEmailValue] = useState('');
   const [loading, setLoading] = useState(false);
   const [accommodationData, setAccommodationData] = useState<{
@@ -237,7 +236,7 @@ const AccommodationDetails: React.FC = () => {
   };
 
 
-  const { scannerMode, deskSession, scannerConnected, socket, enableScannerMode, disableScannerMode } = useScanner();
+  const { scannerMode, deskSession, scannerConnected, socket, enableScannerMode, disableScannerMode, uniqueIdValue, setUniqueIdValue } = useScanner();
   // Auto-fetch when unique ID is complete
   useEffect(() => {
     if (uniqueIdValue.length === 4 && activeTab === 'uniqueId') {
