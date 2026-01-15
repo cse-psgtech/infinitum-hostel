@@ -242,7 +242,7 @@ const AccommodationDetails: React.FC = () => {
     if (uniqueIdValue.length === 4 && activeTab === 'uniqueId') {
       fetchByUniqueId(uniqueIdValue);
     }
-  }, [uniqueIdValue, activeTab, fetchByUniqueId]);
+  }, [uniqueIdValue, activeTab]);
 
   // Fetch room data when accommodation data changes
   useEffect(() => {
