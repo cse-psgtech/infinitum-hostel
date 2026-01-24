@@ -7,7 +7,6 @@ import logger from '../utils/logger';
 // Zod schemas
 const createRoomSchema = z.object({
   RoomName: z.string().min(1, 'Room name is required'),
-  roomtype: z.string().min(1, 'Room type is required'),
   gender: z.enum(['male', 'female', 'mixed']),
   Capacity: z.number().int().positive('Capacity must be a positive integer')
 });
@@ -20,7 +19,6 @@ const addMemberSchema = z.object({
 
 const updateRoomSchema = z.object({
   RoomName: z.string().min(1, 'Room name is required').optional(),
-  roomtype: z.string().min(1, 'Room type is required').optional(),
   gender: z.enum(['male', 'female', 'mixed']).optional(),
   members: z.array(z.object({
     uniqueId: z.string().min(1, 'Unique ID is required'),
@@ -41,12 +39,11 @@ export const createRoom = async (req: Request, res: Response) => {
     try {
         // Validate request body
         const validatedData = createRoomSchema.parse(req.body);
-        const { RoomName, roomtype, gender, Capacity } = validatedData;
+        const { RoomName, gender, Capacity } = validatedData;
 
         logger.info('Attempting to create new room', {
             particular: 'create_room',
             RoomName,
-            roomtype,
             gender,
             Capacity
         });
@@ -66,7 +63,6 @@ export const createRoom = async (req: Request, res: Response) => {
 
         const newRoom = new Room({
             RoomName,
-            roomtype,
             gender,
             members: [],
             Capacity
@@ -319,7 +315,7 @@ export const updateRoom = async (req: Request, res: Response) => {
     try {
         // Validate request body
         const validatedData = updateRoomSchema.parse(req.body);
-        const { RoomName, roomtype, gender, members, Capacity } = validatedData;
+        const { RoomName, gender, members, Capacity } = validatedData;
 
         const { id } = req.params;
 
@@ -331,7 +327,7 @@ export const updateRoom = async (req: Request, res: Response) => {
 
         const updatedRoom = await Room.findByIdAndUpdate(
             id,
-            { ...(RoomName && { RoomName }), ...(roomtype && { roomtype }), ...(gender && { gender }), ...(members && { members }), ...(Capacity && { Capacity }) },
+            { ...(RoomName && { RoomName }), ...(gender && { gender }), ...(members && { members }), ...(Capacity && { Capacity }) },
             { new: true, runValidators: true }
         );
 

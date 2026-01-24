@@ -14,11 +14,6 @@ const registerAccommodationSchema = z.object({
   city: z.string().min(1, 'City is required'),
   phone: z.string().min(1, 'Phone number is required'),
   gender: z.enum(['male', 'female', 'other'], 'Invalid gender'),
-  breakfast1: z.boolean().optional(),
-  breakfast2: z.boolean().optional(),
-  dinner1: z.boolean().optional(),
-  dinner2: z.boolean().optional(),
-  amenities: z.string().min(1, 'Amenities are required'),
   amount: z.number(),
   optin: z.boolean().optional(),
 });
@@ -320,35 +315,7 @@ export const getAccommodationStats = async (req: Request, res: Response) => {
     const maleStats = await Accommodation.countDocuments({ gender: 'male' });
     const femaleStats = await Accommodation.countDocuments({ gender: 'female' });
 
-    // 2. Meal Statistics - Breakfast
-    const breakfast1 = await Accommodation.aggregate([
-      { $match: { breakfast1: true } },
-      { $group: { _id: '$gender', count: { $sum: 1 } } }
-    ]);
-
-    const breakfast2 = await Accommodation.aggregate([
-      { $match: { breakfast2: true } },
-      { $group: { _id: '$gender', count: { $sum: 1 } } }
-    ]);
-
-    // 3. Meal Statistics - Dinner
-    const dinner1 = await Accommodation.aggregate([
-      { $match: { dinner1: true } },
-      { $group: { _id: '$gender', count: { $sum: 1 } } }
-    ]);
-
-    const dinner2 = await Accommodation.aggregate([
-      { $match: { dinner2: true } },
-      { $group: { _id: '$gender', count: { $sum: 1 } } }
-    ]);
-
-    // 4. Amenities Statistics
-    const amenities = await Accommodation.aggregate([
-      { $match: { amenities: { $ne: '' } } },
-      { $group: { _id: '$gender', count: { $sum: 1 } } }
-    ]);
-
-    // 5. Total Count
+    // 2. Total Count
     const totalRooms = await Accommodation.countDocuments();
 
     logger.info('Accommodation statistics fetched successfully', {
@@ -364,19 +331,6 @@ export const getAccommodationStats = async (req: Request, res: Response) => {
         genderStats: {
           maleStats,
           femaleStats
-        },
-        mealStats: {
-          breakfast: {
-            breakfast1,
-            breakfast2
-          },
-          dinner: {
-            dinner1,
-            dinner2
-          }
-        },
-        amenitiesStats: {
-          amenities
         },
         totalRooms
       }
@@ -420,7 +374,6 @@ export const getAllAccommodations = async (req: Request, res: Response) => {
           room: room ? {
             _id: room._id,
             RoomName: room.RoomName,
-            roomtype: room.roomtype,
             gender: room.gender,
             Capacity: room.Capacity,
             currentOccupancy: room.members.length

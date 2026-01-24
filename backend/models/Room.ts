@@ -5,11 +5,6 @@ const RoomSchema = new Schema({
         type: String,
         required: true,
     },
-    roomtype: {
-        type: String,
-        required: true,
-        default: 'single'
-    },
     gender: {
         type: String,
         required: true,
