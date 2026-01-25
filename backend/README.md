@@ -240,9 +240,7 @@
     "city": "string (required)",
     "phone": "string (required)",
     "gender": "male | female | other (required)",
-    "from": "string (required, date)",
-    "to": "string (required, date)",
-    "amount": "number (required, positive)",
+    "amount": "number (required)",
     "optin": "boolean (optional)"
   }
   ```
