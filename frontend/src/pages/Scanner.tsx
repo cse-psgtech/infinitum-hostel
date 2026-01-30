@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast, Toaster } from 'react-hot-toast';
+import { useClearScan } from "./cleanandscan";
+
 
 const Scanner: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -19,6 +21,8 @@ const Scanner: React.FC = () => {
 
   const deskId = searchParams.get('deskId');
   const signature = searchParams.get('signature');
+  const clearScan = useClearScan();
+
 
   useEffect(() => {
     if (!deskId || !signature) {
@@ -209,38 +213,48 @@ const Scanner: React.FC = () => {
           <div id="qr-reader" className="rounded-xl overflow-hidden mb-4 min-h-[280px] bg-gray-800/50"></div>
 
           {/* Scanner Controls */}
-          {!scanning && !paused && (
-            <button
-              onClick={startScanner}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-purple-500/25 transition-all duration-200 active:scale-95"
-            >
-              <div className="flex items-center justify-center space-x-2">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                </svg>
-                <span>Start Scanning</span>
-              </div>
-            </button>
-          )}
-
           {scanning && (
-            <div className="space-y-3">
-              <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
-                <div className="flex items-center justify-center space-x-2 text-green-300">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="font-medium">Scanner Active</span>
-                </div>
-                <p className="text-green-200 text-sm mt-1">Point camera at QR code</p>
-              </div>
+  <div className="space-y-3">
+    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
+      <div className="flex items-center justify-center space-x-2 text-green-300">
+        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+        <span className="font-medium">Scanner Active</span>
+      </div>
+      <p className="text-green-200 text-sm mt-1">Point camera at QR code</p>
+    </div>
 
-              <button
-                onClick={stopScanner}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-200 active:scale-95"
-              >
-                Stop Scanner
-              </button>
-            </div>
-          )}
+    {/* Clear & Scan Next button goes here */}
+    <button
+      onClick={clearScan}   // <-- from your ClearScan hook/module
+      className="w-full relative px-4 py-2 overflow-hidden rounded-xl 
+                 text-white font-medium transition-all duration-200 
+                 flex items-center justify-center group"
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 
+                      transition-all duration-300 group-hover:scale-105"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 
+                      opacity-0 group-hover:opacity-100 transition-opacity 
+                      duration-300 blur"></div>
+      <div className="relative flex items-center space-x-2">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span className="text-sm">Clear & Scan Next</span>
+      </div>
+    </button>
+
+    {/* Stop Scanner button */}
+    <button
+      onClick={stopScanner}
+      className="w-full bg-gradient-to-r from-red-600 to-red-700 
+                 hover:from-red-500 hover:to-red-600 
+                 text-white py-3 rounded-xl font-bold shadow-lg 
+                 transition-all duration-200 active:scale-95"
+    >
+      Stop Scanner
+    </button>
+  </div>
+)}
 
           {paused && !scanning && (
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 text-center">
@@ -255,6 +269,8 @@ const Scanner: React.FC = () => {
             </div>
           )}
         </div>
+
+         
 
         {/* Quick Instructions */}
         <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl p-5 shadow-xl border border-purple-500/20">
