@@ -3,6 +3,9 @@ import { toast } from 'react-hot-toast';
 import { accommodationAPI, roomAPI} from '../api';
 import { QRCodeSVG } from 'qrcode.react';
 import { useScanner } from "./ScannerContext";
+import { useClearScan } from "./cleanandscan";
+
+
 
 
 // Custom OTP Input Component
@@ -85,7 +88,7 @@ interface Room {
 }
 
 const AccommodationDetails: React.FC = () => {
-  
+  const clearScan = useClearScan();
 
   const [activeTab, setActiveTab] = useState<'uniqueId' | 'email'>('uniqueId');
   const [emailValue, setEmailValue] = useState('');
@@ -394,16 +397,7 @@ const AccommodationDetails: React.FC = () => {
             <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl p-6 shadow-2xl border border-purple-500/30 relative">
               {uniqueIdValue && (
                 <button
-                  onClick={() => {
-                    setUniqueIdValue('');
-                    setAccommodationData(null);
-                    setRoomData(null);
-                    // Signal scanner to resume
-                    if (socket && scannerMode) {
-                      socket.emit('resume-scanning');
-                      toast.success('Ready for next scan');
-                    }
-                  }}
+                  onClick={clearScan}
                   className="absolute top-4 right-4 px-4 py-2 overflow-hidden rounded-xl text-white font-medium transition-all duration-200 flex items-center group z-10"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 transition-all duration-300 group-hover:scale-105"></div>
