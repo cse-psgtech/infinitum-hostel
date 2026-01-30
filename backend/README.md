@@ -240,15 +240,7 @@
     "city": "string (required)",
     "phone": "string (required)",
     "gender": "male | female | other (required)",
-    "roomType": "string (required)",
-    "from": "string (required, date)",
-    "to": "string (required, date)",
-    "breakfast1": "boolean (optional)",
-    "breakfast2": "boolean (optional)",
-    "dinner1": "boolean (optional)",
-    "dinner2": "boolean (optional)",
-    "amenities": "string (required)",
-    "amount": "number (required, positive)",
+    "amount": "number (required)",
     "optin": "boolean (optional)"
   }
   ```

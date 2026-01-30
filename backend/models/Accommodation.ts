@@ -33,26 +33,6 @@ const AccommodationSchema = new Schema({
         type: String,
         required: true,
     },
-    breakfast1: {
-        type: Boolean,
-        default: false,
-    },
-    breakfast2: {
-        type: Boolean,
-        default: false,
-    },
-    dinner1: {
-        type: Boolean,
-        default: false,
-    },
-    dinner2: {
-        type: Boolean,
-        default: false,
-    },
-    amenities: {
-        type: String,
-        required: true,
-    },
     amount: {
         type: Number,
         required: true,
