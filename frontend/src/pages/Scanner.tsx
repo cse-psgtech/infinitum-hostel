@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast, Toaster } from 'react-hot-toast';
-import { useClearScan } from "./cleanandscan";
+
 
 
 const Scanner: React.FC = () => {
@@ -21,7 +21,7 @@ const Scanner: React.FC = () => {
 
   const deskId = searchParams.get('deskId');
   const signature = searchParams.get('signature');
-  const clearScan = useClearScan();
+  
 
 
   useEffect(() => {
@@ -65,6 +65,14 @@ const Scanner: React.FC = () => {
       setStatusMessage('Ready for next scan');
       startScanner();
     });
+
+    socket.on('clear-scan', () => {
+      setLastScanned(null);
+      setPaused(false);
+      pausedRef.current = false;
+      toast.success('Cleared by desk');
+    });
+
 
     socket.on('error', ({ message }: { message: string }) => {
       setStatusMessage(`Error: ${message}`);
@@ -168,6 +176,18 @@ const Scanner: React.FC = () => {
     setScanning(false);
   };
 
+  const clearScan = () => {
+    setLastScanned(null);
+    setPaused(false);
+    pausedRef.current = false;
+
+    if (socketRef.current) {
+      socketRef.current.emit('clear-scan', { deskId });
+      socketRef.current.emit('resume-scanning');
+      toast.success('Ready for next scan');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black p-4 relative overflow-hidden">
       {/* Animated background */}
@@ -223,24 +243,14 @@ const Scanner: React.FC = () => {
       <p className="text-green-200 text-sm mt-1">Point camera at QR code</p>
     </div>
 
-    {/* Clear & Scan Next button goes here */}
     <button
-      onClick={clearScan}   // <-- from your ClearScan hook/module
-      className="w-full relative px-4 py-2 overflow-hidden rounded-xl 
-                 text-white font-medium transition-all duration-200 
-                 flex items-center justify-center group"
+      onClick={clearScan}
+      className="w-full bg-gradient-to-r from-green-600 to-green-700 
+                 hover:from-green-500 hover:to-green-600 
+                 text-white py-3 rounded-xl font-bold shadow-lg 
+                 transition-all duration-200 active:scale-95"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 
-                      transition-all duration-300 group-hover:scale-105"></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 
-                      opacity-0 group-hover:opacity-100 transition-opacity 
-                      duration-300 blur"></div>
-      <div className="relative flex items-center space-x-2">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-        <span className="text-sm">Clear & Scan Next</span>
-      </div>
+      Clear Scan
     </button>
 
     {/* Stop Scanner button */}

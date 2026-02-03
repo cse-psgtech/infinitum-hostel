@@ -203,6 +203,22 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       }
     });
 
+  socket.on("clear-scan", ({ deskId }) => {
+  const room = deskRooms.get(deskId);
+  if (!room) {
+    socket.emit("error", { message: "Desk session not found" });
+    return;
+  }
+
+  if (room.deskClient) {
+    room.deskClient.emit("clear-scan");
+  }
+  if (room.scannerClient) {
+    room.scannerClient.emit("clear-scan");
+  }
+
+  console.log(`Forwarded clear-scan to desk and scanner in desk ${deskId}`);
+});
     // Handle errors
     socket.on('error', (error) => {
       console.error(`Socket error for ${socket.id}:`, error);
