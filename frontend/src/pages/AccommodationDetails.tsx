@@ -234,6 +234,9 @@ const AccommodationDetails: React.FC = () => {
 
 
   const { scannerMode, deskSession, scannerConnected, socket, enableScannerMode, disableScannerMode, uniqueIdValue, setUniqueIdValue } = useScanner();
+
+  
+
   // Auto-fetch when unique ID is complete
   useEffect(() => {
     if (uniqueIdValue.length === 4 && activeTab === 'uniqueId') {
@@ -241,9 +244,22 @@ const AccommodationDetails: React.FC = () => {
     }
   }, [uniqueIdValue, activeTab]);
 
-  
+  useEffect(() => {
+  if (!socket) return;
 
+  const handleClearScan = () => {
+    setUniqueIdValue("");
+    setAccommodationData(null);
+    setRoomData(null);
+    toast.success("Cleared by scanner");
+  };
 
+  socket.on("clear-scan", handleClearScan);
+
+  return () => {
+    socket.off("clear-scan", handleClearScan);
+  };
+}, [socket]);
 
   // Fetch room data when accommodation data changes
   useEffect(() => {
@@ -312,6 +328,19 @@ const AccommodationDetails: React.FC = () => {
       currency: 'INR'
     }).format(amount);
   };
+
+  const clearScan = () => {
+    setUniqueIdValue("");
+    setAccommodationData(null);
+    setRoomData(null);
+
+    if (socket && scannerMode) {
+      socket.emit("clear-scan");        // broadcast reset
+      socket.emit("resume-scanning");   // desk is allowed to resume
+      toast.success("Ready for next scan");
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black relative overflow-hidden p-6 tomorrow-regular">
@@ -395,16 +424,7 @@ const AccommodationDetails: React.FC = () => {
             <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl p-6 shadow-2xl border border-purple-500/30 relative">
               {uniqueIdValue && (
                 <button
-                    onClick={() => {
-                    setUniqueIdValue('');
-                    setAccommodationData(null);
-                    setRoomData(null);
-                    // Signal scanner to resume
-                    if (socket && scannerMode) {
-                      socket.emit('resume-scanning');
-                      toast.success('Ready for next scan');
-                    }
-                  }}
+                    onClick={clearScan}
                   className="absolute top-4 right-4 px-4 py-2 overflow-hidden rounded-xl text-white font-medium transition-all duration-200 flex items-center group z-10"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 transition-all duration-300 group-hover:scale-105"></div>
