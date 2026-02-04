@@ -145,28 +145,25 @@ export const initializeSocket = (httpServer: HTTPServer) => {
     });
 
     // Handle resume scanning signal from desk
-    socket.on('resume-scanning', () => {
-      const deskId = socket.data.deskId;
-      const role = socket.data.role;
+    socket.on("resume-scanning", () => {
+  const deskId = socket.data.deskId;
+  const role = socket.data.role;
 
-      console.log(`Resume scanning request from ${role} in desk ${deskId}`);
+  if (role !== "desk") {
+    socket.emit("socket-error", { message: "Only desk can resume scanning" });
+    return;
+  }
 
-      if (role !== 'desk') {
-        socket.emit('error', { message: 'Only desk can resume scanning' });
-        return;
-      }
+  const room = deskRooms.get(deskId);
+  if (!room || !room.scannerClient) {
+    socket.emit("socket-error", { message: "Scanner not connected" });
+    return;
+  }
 
-      const room = deskRooms.get(deskId);
-      if (!room || !room.scannerClient) {
-        socket.emit('error', { message: 'Scanner not connected' });
-        return;
-      }
+  room.scannerClient.emit("resume-scanning");
+  console.log(`Forwarded resume-scanning signal to scanner in desk ${deskId}`);
+});
 
-      // Forward to scanner client
-      room.scannerClient.emit('resume-scanning');
-      
-      console.log(`Forwarded resume-scanning signal to scanner in desk ${deskId}`);
-    });
 
     // Handle disconnection
     socket.on('disconnect', () => {
@@ -203,10 +200,11 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       }
     });
 
-  socket.on("clear-scan", ({ deskId }) => {
+  socket.on("clear-scan", () => {
+  const deskId = socket.data.deskId;
   const room = deskRooms.get(deskId);
   if (!room) {
-    socket.emit("error", { message: "Desk session not found" });
+    socket.emit("socket-error", { message: "Desk session not found" });
     return;
   }
 
@@ -219,6 +217,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
 
   console.log(`Forwarded clear-scan to desk and scanner in desk ${deskId}`);
 });
+
     // Handle errors
     socket.on('error', (error) => {
       console.error(`Socket error for ${socket.id}:`, error);
