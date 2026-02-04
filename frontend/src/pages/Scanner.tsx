@@ -4,8 +4,6 @@ import { io, Socket } from 'socket.io-client';
 import { Html5Qrcode } from 'html5-qrcode';
 import { toast, Toaster } from 'react-hot-toast';
 
-
-
 const Scanner: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [connected, setConnected] = useState(false);
@@ -21,8 +19,6 @@ const Scanner: React.FC = () => {
 
   const deskId = searchParams.get('deskId');
   const signature = searchParams.get('signature');
-  
-
 
   useEffect(() => {
     if (!deskId || !signature) {
@@ -33,8 +29,12 @@ const Scanner: React.FC = () => {
 
     setStatusMessage('Connecting to desk...');
 
-    const socket = io(import.meta.env.VITE_API_BASE?.replace('inf/api/acc', '') || `${window.location.protocol}//${window.location.hostname}:3000`, { path: '/api/accommodationsocket' });
-    socketRef.current = socket; 
+    const socket = io(
+      import.meta.env.VITE_API_BASE?.replace('inf/api/acc', '') ||
+        `${window.location.protocol}//${window.location.hostname}:3000`,
+      { path: '/api/accommodationsocket' }
+    );
+    socketRef.current = socket;
 
     socket.emit('join-scanner', { deskId, signature });
 
@@ -66,13 +66,16 @@ const Scanner: React.FC = () => {
       startScanner();
     });
 
-    socket.on('clear-scan', () => {
+    // Listen for clear-scan from desk
+    const handleClearScan = () => {
       setLastScanned(null);
       setPaused(false);
       pausedRef.current = false;
+      startScanner();
       toast.success('Cleared by desk');
-    });
-
+      setStatusMessage('Ready for next scan'); 
+    };
+    socket.on('clear-scan', handleClearScan);
 
     socket.on('error', ({ message }: { message: string }) => {
       setStatusMessage(`Error: ${message}`);
@@ -81,6 +84,7 @@ const Scanner: React.FC = () => {
 
     return () => {
       stopScanner();
+      socket.off('clear-scan', handleClearScan);
       socket.disconnect();
     };
   }, [deskId, signature]);
@@ -103,10 +107,7 @@ const Scanner: React.FC = () => {
 
       await html5QrCode.start(
         { facingMode: 'environment' },
-        {
-          fps: 10,
-          qrbox: { width: 280, height: 280 }
-        },
+        { fps: 10, qrbox: { width: 280, height: 280 } },
         (decodedText) => {
           if (pausedRef.current || !socketRef.current || !connectedRef.current) return;
 
@@ -121,7 +122,7 @@ const Scanner: React.FC = () => {
             stopScanner();
           }
         },
-        () => { } // Silent error handling
+        () => {}
       );
 
       setScanning(true);
@@ -150,7 +151,7 @@ const Scanner: React.FC = () => {
                 socketRef.current.emit('scan-participant', { uniqueId: decodedText.trim() });
               }
             },
-            () => { }
+            () => {}
           );
 
           setScanning(true);
@@ -176,97 +177,89 @@ const Scanner: React.FC = () => {
     setScanning(false);
   };
 
+  
   const clearScan = () => {
     setLastScanned(null);
     setPaused(false);
     pausedRef.current = false;
 
     if (socketRef.current) {
-      socketRef.current.emit('clear-scan', { deskId });
-      socketRef.current.emit('resume-scanning');
+      socketRef.current.emit('clear-scan');   
       toast.success('Ready for next scan');
+      setStatusMessage('Ready for next scan');
     }
   };
 
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black p-4 relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-      </div>
-
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
-
-      <Toaster position="top-center" />
-
-      <div className="max-w-lg mx-auto relative z-10 space-y-4">
-        {/* Header Card */}
-        <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-purple-500/30">
-          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 mb-4 text-center">
-            QR Scanner
-          </h1>
-
-          {/* Connection Status */}
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className={`w-4 h-4 rounded-full ${connected ? 'bg-green-500 shadow-lg shadow-green-500/50 animate-pulse' : 'bg-red-500 shadow-lg shadow-red-500/50'}`}></div>
-            <span className="text-white font-medium">
-              {connected ? 'Connected' : 'Connecting...'}
-            </span>
-          </div>
-
-          {/* Status Message */}
-          <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3 text-center">
-            <p className="text-purple-200 text-sm">{statusMessage}</p>
-          </div>
-
-          {/* Last Scanned */}
-          {lastScanned && (
-            <div className="mt-3 bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-center">
-              <p className="text-green-300 text-sm font-medium">Last Scanned: {lastScanned}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Scanner Card */}
-        <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-purple-500/30">
-          <div id="qr-reader" className="rounded-xl overflow-hidden mb-4 min-h-[280px] bg-gray-800/50"></div>
-
-          {/* Scanner Controls */}
-          {scanning && (
-  <div className="space-y-3">
-    <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
-      <div className="flex items-center justify-center space-x-2 text-green-300">
-        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-        <span className="font-medium">Scanner Active</span>
-      </div>
-      <p className="text-green-200 text-sm mt-1">Point camera at QR code</p>
+  <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-black p-4 relative overflow-hidden">
+    {/* Animated background */}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
     </div>
 
-    <button
-      onClick={clearScan}
-      className="w-full bg-gradient-to-r from-green-600 to-green-700 
-                 hover:from-green-500 hover:to-green-600 
-                 text-white py-3 rounded-xl font-bold shadow-lg 
-                 transition-all duration-200 active:scale-95"
-    >
-      Clear Scan
-    </button>
+    <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
 
-    {/* Stop Scanner button */}
-    <button
-      onClick={stopScanner}
-      className="w-full bg-gradient-to-r from-red-600 to-red-700 
-                 hover:from-red-500 hover:to-red-600 
-                 text-white py-3 rounded-xl font-bold shadow-lg 
-                 transition-all duration-200 active:scale-95"
-    >
-      Stop Scanner
-    </button>
-  </div>
-)}
+    <Toaster position="top-center" />
 
-          {paused && !scanning && (
+    <div className="max-w-lg mx-auto relative z-10 space-y-4">
+      {/* Header Card */}
+      <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-purple-500/30">
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 mb-4 text-center">
+          QR Scanner
+        </h1>
+
+        {/* Connection Status */}
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          <div className={`w-4 h-4 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+          <span className="text-white font-medium">
+            {connected ? 'Connected' : 'Connecting...'}
+          </span>
+        </div>
+
+        {/* Status Message */}
+        <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-3 text-center">
+          <p className="text-purple-200 text-sm">{statusMessage}</p>
+        </div>
+
+        {/* Last Scanned */}
+        {lastScanned && (
+          <div className="mt-3 bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-center">
+            <p className="text-green-300 text-sm font-medium">Last Scanned: {lastScanned}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Scanner Card */}
+      <div className="bg-gray-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-purple-500/30">
+        <div id="qr-reader" className="rounded-xl overflow-hidden mb-4 min-h-[280px] bg-gray-800/50"></div>
+
+        {/* Scanner Controls */}
+        {scanning && (
+          <div className="space-y-3">
+            <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
+              <div className="flex items-center justify-center space-x-2 text-green-300">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="font-medium">Scanner Active</span>
+              </div>
+              <p className="text-green-200 text-sm mt-1">Point camera at QR code</p>
+            </div>
+
+            {/* Stop Scanner button */}
+            <button
+              onClick={stopScanner}
+              className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-200 active:scale-95"
+            >
+              Stop Scanner
+            </button>
+          </div>
+        )}
+
+        {/* Paused state controls */}
+        {paused && !scanning && (
+          <div className="space-y-3">
             <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 text-center">
               <div className="flex items-center justify-center space-x-2 text-orange-300 mb-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -277,37 +270,30 @@ const Scanner: React.FC = () => {
               <p className="text-orange-200 text-sm">Waiting for desk to process...</p>
               <p className="text-orange-300 text-xs mt-1">Camera will restart automatically</p>
             </div>
-          )}
-        </div>
 
-         
+            {/* Clear & Scan Next button */}
+            <button
+              onClick={clearScan}
+              className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-200 active:scale-95"
+            >
+              Clear & Scan Next
+            </button>
+          </div>
+        )}
+      </div>
 
-        {/* Quick Instructions */}
-        <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl p-5 shadow-xl border border-purple-500/20">
-          <h3 className="text-purple-300 font-bold mb-3 flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Quick Guide
-          </h3>
-          <ul className="space-y-2 text-gray-300 text-sm">
-            <li className="flex items-start">
-              <span className="text-purple-400 mr-2">1.</span>
-              <span>Keep this page open and connected</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-purple-400 mr-2">2.</span>
-              <span>Scan participant QR codes one at a time</span>
-            </li>
-            <li className="flex items-start">
-              <span className="text-purple-400 mr-2">3.</span>
-              <span>Wait for confirmation before next scan</span>
-            </li>
-          </ul>
-        </div>
+      {/* Quick Instructions */}
+      <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl p-5 shadow-xl border border-purple-500/20">
+        <h3 className="text-purple-300 font-bold mb-3 flex items-center">Quick Guide</h3>
+        <ul className="space-y-2 text-gray-300 text-sm">
+          <li>Keep this page open and connected</li>
+          <li>Scan participant QR codes one at a time</li>
+          <li>Wait for confirmation before next scan</li>
+        </ul>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default Scanner;
