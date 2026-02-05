@@ -122,27 +122,29 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       const deskId = socket.data.deskId;
       const role = socket.data.role;
 
-      console.log(`Scan received from ${role} in desk ${deskId}: ${uniqueId}`);
-
       if (role !== 'scanner') {
         socket.emit('error', { message: 'Only scanner can send scans' });
         return;
       }
 
       const room = deskRooms.get(deskId);
-      if (!room || !room.deskClient) {
+      if (!room) {
         socket.emit('error', { message: 'Desk not connected' });
         return;
       }
 
-      // Forward to desk client
-      room.deskClient.emit('scan-acknowledged', { uniqueId });
-      
-      // Acknowledge scanner
-      socket.emit('scan-acknowledged', { uniqueId });
+      // Forward to both desk and scanner
+      if (room.deskClient) {
+        room.deskClient.emit('scan-acknowledged', { uniqueId });
+      }
+      if (room.scannerClient) {
+        room.scannerClient.emit('scan-acknowledged', { uniqueId });
+      }
 
-      console.log(`Forwarded scan to desk ${deskId}`);
+      console.log(`Forwarded scan to desk and scanner in desk ${deskId}`);
     });
+
+
 
     // Handle resume scanning signal from desk
     socket.on("resume-scanning", () => {
@@ -150,13 +152,13 @@ export const initializeSocket = (httpServer: HTTPServer) => {
   const role = socket.data.role;
 
   if (role !== "desk") {
-    socket.emit("socket-error", { message: "Only desk can resume scanning" });
+    socket.emit("error", { message: "Only desk can resume scanning" });
     return;
   }
 
   const room = deskRooms.get(deskId);
   if (!room || !room.scannerClient) {
-    socket.emit("socket-error", { message: "Scanner not connected" });
+    socket.emit("error", { message: "Scanner not connected" });
     return;
   }
 
@@ -204,7 +206,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
   const deskId = socket.data.deskId;
   const room = deskRooms.get(deskId);
   if (!room) {
-    socket.emit("socket-error", { message: "Desk session not found" });
+    socket.emit("error", { message: "Desk session not found" });
     return;
   }
 
