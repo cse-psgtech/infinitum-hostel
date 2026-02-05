@@ -226,10 +226,19 @@ const Scanner: React.FC = () => {
 
         {/* Last Scanned */}
         {lastScanned && (
-          <div className="mt-3 bg-green-500/10 border border-green-500/30 rounded-xl p-3 text-center">
-            <p className="text-green-300 text-sm font-medium">Last Scanned: {lastScanned}</p>
-          </div>
-        )}
+  <div className="space-y-3">
+    <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 text-center">
+      <p className="text-orange-200 text-sm">Last scanned: {lastScanned}</p>
+    </div>
+
+    <button
+      onClick={clearScan}
+      className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-200 active:scale-95"
+    >
+      Clear & Scan Next
+    </button>
+  </div>
+)}
       </div>
 
       {/* Scanner Card */}
@@ -276,21 +285,7 @@ const Scanner: React.FC = () => {
         )}
       </div>
 
-      {lastScanned && (
-    <div className="space-y-3">
-      <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 text-center">
-        <p className="text-orange-200 text-sm">Last scanned: {lastScanned}</p>
-      </div>
-
-      <button
-        onClick={clearScan}
-        className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-200 active:scale-95"
-      >
-        Clear & Scan Next
-      </button>
-    </div>
-  )}
-
+      
 
       {/* Quick Instructions */}
       <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl p-5 shadow-xl border border-purple-500/20">
