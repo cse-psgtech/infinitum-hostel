@@ -32,7 +32,7 @@ const Scanner: React.FC = () => {
     const socket = io(
       import.meta.env.VITE_API_BASE?.replace('inf/api/acc', '') ||
         `${window.location.protocol}//${window.location.hostname}:3000`,
-      { path: '/api/accommodationsocket' }
+      { path: '/accommodationsocket' }
     );
     socketRef.current = socket;
 
