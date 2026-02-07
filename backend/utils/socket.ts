@@ -23,6 +23,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
           'http://localhost:5173',
           ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
           'https://infinitum-hostel.vercel.app',
+           'https://hostelinfinitum.psgtech.ac.in',
           /^http:\/\/192\.168\.\d+\.\d+:5173$/, // 192.168.x.x:5173
           /^http:\/\/10\.\d+\.\d+\.\d+:5173$/,   // 10.x.x.x:5173
           /^http:\/\/172\.\d+\.\d+\.\d+:5173$/,  // 172.x.x.x:5173
