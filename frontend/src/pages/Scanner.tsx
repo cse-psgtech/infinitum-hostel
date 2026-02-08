@@ -185,7 +185,6 @@ const Scanner: React.FC = () => {
 
     if (socketRef.current) {
       socketRef.current.emit('clear-scan');   
-      toast.success('Ready for next scan');
       setStatusMessage('Ready for next scan');
     }
   };
@@ -232,11 +231,21 @@ const Scanner: React.FC = () => {
     </div>
 
     <button
-      onClick={clearScan}
-      className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all duration-200 active:scale-95"
-    >
-      Clear & Scan Next
-    </button>
+  onClick={clearScan}
+  className="w-full relative px-4 py-3 overflow-hidden rounded-xl text-white font-semibold tracking-wide shadow-lg transition-all duration-200 active:scale-95 flex items-center justify-center group"
+>
+  {/* Background gradient layers */}
+  <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 transition-all duration-300 group-hover:scale-105"></div>
+  <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
+
+  {/* Content */}
+  <div className="relative flex items-center space-x-2">
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+    <span className="text-sm">Clear & Scan Next</span>
+  </div>
+</button>
   </div>
 )}
       </div>
