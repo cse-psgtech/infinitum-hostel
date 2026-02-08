@@ -46,7 +46,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       methods: ['GET', 'POST'],
       credentials: true
     },
-    path: '/accommodationsocket'
+    path: 'inf/api/acc/accommodationsocket'
   });
 
   io.on('connection', (socket: Socket) => {
