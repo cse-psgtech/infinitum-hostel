@@ -28,7 +28,7 @@ export const ScannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   
 
   const connectSocket = (session: { deskId: string; signature: string }) => {
-    const socket = io( import.meta.env.VITE_API_BASE?.replace("inf/api/acc", "") || `${window.location.protocol}//${window.location.hostname}:3000`, { path: "inf/api/acc/accommodationsocket" } );
+    const socket = io( import.meta.env.VITE_API_BASE?.replace("inf/api/acc", "") || `${window.location.protocol}//${window.location.hostname}:3000`, { path: "/inf/api/acc/accommodationsocket" } );
     socketRef.current = socket;
     socket.emit("join-desk", session);
 
