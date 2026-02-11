@@ -19,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   ];
 
   const handleLogout = () => {
+    setIsOpen(false);
     logout();
   };
 
@@ -30,28 +31,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           className="fixed inset-0 z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
         >
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
         </div>
       )}
 
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-br from-gray-900 via-[rgba(67,2,105,0.3)] to-gray-900 flex relative overflow-hidden tomorrow-regular ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      } transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+      {/* Sidebar - Desktop Only */}
+      <div className={`hidden lg:flex flex-col w-64 h-full fixed inset-y-0 left-0 z-50 bg-gradient-to-br from-gray-900 via-[rgba(67,2,105,0.3)] to-gray-900 border-r border-purple-500/20`}>
         <div className="flex flex-col h-full relative">
           {/* Animated background glow */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute w-48 h-48 -top-24 -left-24 bg-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute w-48 h-48 -bottom-24 -right-24 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+            <div className="absolute w-48 h-48 -bottom-24 -right-24 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
           </div>
 
           {/* Logo/Brand */}
           <div className="relative flex items-center justify-center h-16 px-4 bg-gradient-to-r from-purple-600/30 to-pink-600/30 border-b border-purple-500/20">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 blur-xl"></div>
             <div className="flex items-center space-x-2 relative z-10">
-              <img 
+              <img
                 src={infinitumLogo}
-                alt="Infinitum Logo" 
+                alt="Infinitum Logo"
                 className="h-16 w-auto"
               />
             </div>
@@ -66,11 +65,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                   key={item.name}
                   to={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 text-purple-300 border-r-4 border-purple-500 shadow-lg shadow-purple-500/20'
-                      : 'text-gray-400 hover:bg-purple-500/10 hover:text-purple-300'
-                  }`}
+                  className={`group relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${isActive
+                    ? 'bg-gradient-to-r from-purple-600/30 to-pink-600/30 text-purple-300 border-r-4 border-purple-500 shadow-lg shadow-purple-500/20'
+                    : 'text-gray-400 hover:bg-purple-500/10 hover:text-purple-300'
+                    }`}
                 >
                   {isActive && (
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-lg blur-sm"></div>

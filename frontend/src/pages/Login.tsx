@@ -69,7 +69,7 @@ const Login: React.FC = () => {
       {/* Center - Login Form */}
       <div className="w-full flex items-center justify-center px-6 py-12 relative z-10">
         <div className="w-full max-w-md">
-          <h2 className="text-center text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 mb-8 tomorrow-bold">
+          <h2 className="text-center text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 mb-8 tomorrow-bold">
             Hostel Portal
           </h2>
 
@@ -79,7 +79,8 @@ const Login: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition duration-300"></div>
 
             {/* Main card */}
-            <div className="relative bg-gray-900/60 backdrop-blur-xl py-6 px-6 shadow-2xl rounded-2xl border border-purple-500/30">
+            {/* Main card */}
+            <div className="relative bg-gray-900/60 backdrop-blur-xl py-6 px-4 md:px-6 shadow-2xl rounded-2xl border border-purple-500/30">
               <form className="space-y-5" onSubmit={handleSubmit}>
                 <div>
                   <label htmlFor="username" className="block text-sm font-medium text-white mb-2">

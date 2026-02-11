@@ -50,17 +50,17 @@ const AllAccommodations: React.FC = () => {
   };
 
   const filteredAccommodations = accommodations.filter((acc) => {
-    const matchesSearch = 
+    const matchesSearch =
       acc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       acc.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       acc.uniqueId.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesPayment = 
+    const matchesPayment =
       filterPayment === 'all' ||
       (filterPayment === 'paid' && acc.payment) ||
       (filterPayment === 'unpaid' && !acc.payment);
 
-    const matchesRoom = 
+    const matchesRoom =
       filterRoom === 'all' ||
       (filterRoom === 'allocated' && acc.room !== null) ||
       (filterRoom === 'unallocated' && acc.room === null);
@@ -89,12 +89,12 @@ const AllAccommodations: React.FC = () => {
   }
 
   return (
-    <div className="p-6 bg-gradient-to-br from-gray-900 via-purple-900/20 to-black min-h-screen relative overflow-hidden tomorrow-regular">
+    <div className="p-4 md:p-6 bg-gradient-to-br from-gray-900 via-purple-900/20 to-black min-h-screen relative overflow-hidden tomorrow-regular">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute w-64 h-64 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute w-64 h-64 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Grid overlay */}
@@ -237,11 +237,10 @@ const AllAccommodations: React.FC = () => {
                 {/* Payment Status */}
                 <div className="flex items-center justify-between p-4 bg-gray-800/50 backdrop-blur-sm rounded-lg border border-purple-500/20">
                   <span className="font-medium text-gray-400">Payment Status</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedAccommodation.payment
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedAccommodation.payment
                       ? 'bg-green-500/20 text-green-300 border border-green-500/30'
                       : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
+                    }`}>
                     {selectedAccommodation.payment ? `Paid - ${formatCurrency(selectedAccommodation.amount)}` : 'Unpaid'}
                   </span>
                 </div>
@@ -310,11 +309,10 @@ const AllAccommodations: React.FC = () => {
 
                 {/* Additional Status */}
                 <div className="flex items-center space-x-4">
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium border ${
-                    selectedAccommodation.vacated
+                  <div className={`px-3 py-1 rounded-full text-sm font-medium border ${selectedAccommodation.vacated
                       ? 'bg-orange-500/20 text-orange-300 border-orange-500/30'
                       : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-                  }`}>
+                    }`}>
                     {selectedAccommodation.vacated ? 'Vacated' : 'Active'}
                   </div>
                   {selectedAccommodation.optin && (

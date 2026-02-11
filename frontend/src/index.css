@@ -374,3 +374,10 @@ body {
   font-weight: 900;
   font-style: italic;
 }
+
+@layer base {
+  html {
+    @apply text-[14px] md:text-[16px];
+    /* Scale base font size for mobile */
+  }
+}

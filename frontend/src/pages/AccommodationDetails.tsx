@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
-import { accommodationAPI, roomAPI} from '../api';
+import { accommodationAPI, roomAPI } from '../api';
 import { QRCodeSVG } from 'qrcode.react';
 import { useScanner } from "./ScannerContext";
 
@@ -48,7 +48,7 @@ const OtpInput: React.FC<{
           value={value[index] || ''}
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
-          className="w-16 h-16 text-center text-2xl font-bold border-2 border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-800/50 text-white"
+          className="w-12 h-12 md:w-16 md:h-16 text-center text-xl md:text-2xl font-bold border-2 border-purple-500/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-800/50 text-white"
         />
       ))}
     </div>
@@ -111,7 +111,7 @@ const AccommodationDetails: React.FC = () => {
   const [roomSearchTerm, setRoomSearchTerm] = useState('');
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
-  
+
 
   // Fetch accommodation by unique ID
   const fetchByUniqueId = async (uniqueId: string) => {
@@ -235,22 +235,22 @@ const AccommodationDetails: React.FC = () => {
 
   const { scannerMode, deskSession, scannerConnected, socket, enableScannerMode, disableScannerMode, uniqueIdValue, setUniqueIdValue } = useScanner();
 
-   useEffect(() => {
-  if (!socket) return;
+  useEffect(() => {
+    if (!socket) return;
 
-  const handleClearScan = () => {
-    setUniqueIdValue("");
-    setAccommodationData(null);
-    setRoomData(null);
-    toast.success("Cleared by scanner");
-  };
+    const handleClearScan = () => {
+      setUniqueIdValue("");
+      setAccommodationData(null);
+      setRoomData(null);
+      toast.success("Cleared by scanner");
+    };
 
-  socket.on("clear-scan", handleClearScan);
+    socket.on("clear-scan", handleClearScan);
 
-  return () => {
-    socket.off("clear-scan", handleClearScan);
-  };
-}, [socket]);
+    return () => {
+      socket.off("clear-scan", handleClearScan);
+    };
+  }, [socket]);
   // Auto-fetch when unique ID is complete
   useEffect(() => {
     if (uniqueIdValue.length === 4 && activeTab === 'uniqueId') {
@@ -258,8 +258,8 @@ const AccommodationDetails: React.FC = () => {
     }
   }, [uniqueIdValue, activeTab]);
 
-  
-  
+
+
 
   // Fetch room data when accommodation data changes
   useEffect(() => {
@@ -335,7 +335,7 @@ const AccommodationDetails: React.FC = () => {
     setRoomData(null);
 
     if (socket && scannerMode) {
-      socket.emit("clear-scan");        
+      socket.emit("clear-scan");
       socket.emit("resume-scanning");
       toast.success("Ready for next scan");
     }
@@ -356,17 +356,17 @@ const AccommodationDetails: React.FC = () => {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
 
       <div className="relative z-10">
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] via-[#ff6b9d] to-[#8b5cf6] tomorrow-bold">Accommodation Details</h1>
             <p className="text-gray-300">View and manage guest accommodation information</p>
           </div>
 
           {/* Scanner Mode Toggle */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 w-full md:w-auto">
             <button
               onClick={scannerMode ? disableScannerMode : enableScannerMode}
-              className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center space-x-2 relative overflow-hidden group ${scannerMode
+              className={`w-full md:w-auto px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2 relative overflow-hidden group ${scannerMode
                 ? 'bg-gradient-to-r from-red-600 to-red-700 hover:shadow-lg hover:shadow-red-500/50 text-white'
                 : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:shadow-lg hover:shadow-purple-500/50 text-white'
                 }`}
@@ -396,8 +396,8 @@ const AccommodationDetails: React.FC = () => {
 
         {/* Tabs */}
         <div className="mb-6">
-          <div className="border-b border-purple-500/30">
-            <nav className="-mb-px flex space-x-8">
+          <div className="border-b border-purple-500/30 overflow-x-auto">
+            <nav className="-mb-px flex space-x-8 min-w-max">
               <button
                 onClick={() => setActiveTab('uniqueId')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${activeTab === 'uniqueId'
@@ -426,7 +426,7 @@ const AccommodationDetails: React.FC = () => {
             <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl p-6 shadow-2xl border border-purple-500/30 relative">
               {uniqueIdValue && (
                 <button
-                    onClick={clearScan}
+                  onClick={clearScan}
                   className="absolute top-4 right-4 px-4 py-2 overflow-hidden rounded-xl text-white font-medium transition-all duration-200 flex items-center group z-10"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-red-700 transition-all duration-300 group-hover:scale-105"></div>
@@ -439,7 +439,7 @@ const AccommodationDetails: React.FC = () => {
                   </div>
                 </button>
               )}
-              <div className="flex items-center space-x-6">
+              <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
                 {scannerMode && deskSession && (
                   <div className="flex-shrink-0">
                     <div className="bg-white p-3 rounded-lg shadow-lg">
@@ -451,9 +451,9 @@ const AccommodationDetails: React.FC = () => {
                     <p className="text-xs text-center text-gray-400 mt-2">Scan with mobile</p>
                   </div>
                 )}
-                <div className="flex-1">
+                <div className="flex-1 w-full md:w-auto">
                   <div className="flex flex-col items-center space-y-4">
-                    <p className="text-lg font-semibold text-white">
+                    <p className="text-lg font-semibold text-white text-center md:text-left">
                       Enter 4-digit Unique ID
                     </p>
                     <div className="flex items-center space-x-4">
@@ -483,7 +483,7 @@ const AccommodationDetails: React.FC = () => {
                 <label className="block text-sm font-medium text-white">
                   Email Address
                 </label>
-                <div className="flex space-x-4">
+                <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
                   <input
                     type="email"
                     value={emailValue}
@@ -494,7 +494,7 @@ const AccommodationDetails: React.FC = () => {
                   <button
                     onClick={fetchByEmail}
                     disabled={loading}
-                    className="relative px-6 py-3 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group">
+                    className="relative w-full md:w-auto px-6 py-3 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center group">
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 group-hover:scale-105"></div>
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
                     <div className="relative flex items-center"

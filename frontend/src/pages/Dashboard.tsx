@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-900/90 backdrop-blur-xl relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
         </div>
         <div className="flex items-center justify-center h-96 relative z-10">
           <div className="relative">
@@ -67,7 +67,7 @@ const Dashboard: React.FC = () => {
       <div className="min-h-screen bg-gray-900/90 backdrop-blur-xl relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+          <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
         </div>
         <div className="text-center py-12 relative z-10">
           <p className="text-gray-500">Failed to load statistics</p>
@@ -81,14 +81,14 @@ const Dashboard: React.FC = () => {
       {/* Animated background glow */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-96 h-96 -top-48 -left-48 bg-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
-        <div className="absolute w-64 h-64 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-600/5 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-pink-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute w-64 h-64 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-purple-600/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
 
       {/* Grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
 
-      <div className="relative z-10 p-6">
+      <div className="relative z-10 p-4 md:p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 tomorrow-bold">Hostel Portal</h1>
           <p className="text-gray-400 mt-1">Accommodation Statistics Overview</p>
