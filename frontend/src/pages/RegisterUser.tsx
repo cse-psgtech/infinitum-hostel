@@ -92,7 +92,6 @@ const RegisterUser: React.FC = () => {
         city: city.trim(),
         phone: selectedUser.phone,
         gender: gender,
-        amount: 0,
         optin: false,
       };
 

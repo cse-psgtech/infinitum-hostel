@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { Accommodation } from '../models/Accommodation';
-import { Room } from '../models/Room';
 import logger from '../utils/logger';
 
 // Zod schema for accommodation registration
@@ -14,13 +13,10 @@ const registerAccommodationSchema = z.object({
   city: z.string().min(1, 'City is required'),
   phone: z.string().min(1, 'Phone number is required'),
   gender: z.enum(['male', 'female', 'other'], 'Invalid gender'),
-  amount: z.number(),
+  day: z.enum(['12', '13', '14', '12 & 13', '13 & 14', '12, 13 & 14'], 'Invalid day selection').optional(),
+  remarks: z.string().optional(),
   optin: z.boolean().optional(),
-});
-
-// Zod schema for updating payment status
-const updatePaymentSchema = z.object({
-  amount: z.number(),
+  allocated: z.boolean().optional(),
 });
 
 export const registerAccommodation = async (req: Request, res: Response) => {
@@ -51,7 +47,6 @@ export const registerAccommodation = async (req: Request, res: Response) => {
     // Create new accommodation
     const newAccommodation = new Accommodation({
       ...validatedData,
-      payment: false, // Default to unpaid
       vacated: false, // Default to not vacated
     });
 
@@ -126,21 +121,16 @@ export const getAccommodationByUniqueId = async (req: Request, res: Response) =>
       });
     }
 
-    // Find room where this uniqueId is in members
-    const room = await Room.findOne({ 'members.uniqueId': uniqueId });
-
     logger.info('Accommodation fetched successfully by uniqueId', {
       uniqueId,
       email: accommodation.email,
-      particular: 'get_accommodation_uniqueid_success',
-      hasRoom: !!room
+      particular: 'get_accommodation_uniqueid_success'
     });
 
     res.status(200).json({
       success: true,
       data: {
-        accommodation,
-        room: room || null
+        accommodation
       }
     });
   } catch (error) {
@@ -189,111 +179,22 @@ export const getAccommodationByEmail = async (req: Request, res: Response) => {
       });
     }
 
-    // Find room where this email is in members
-    const room = await Room.findOne({ 'members.email': email });
-
     logger.info('Accommodation fetched successfully by email', {
       uniqueId: accommodation.uniqueId,
       email,
-      particular: 'get_accommodation_email_success',
-      hasRoom: !!room
+      particular: 'get_accommodation_email_success'
     });
 
     res.status(200).json({
       success: true,
       data: {
-        accommodation,
-        room: room || null
+        accommodation
       }
     });
   } catch (error) {
     logger.error('Error fetching accommodation by email', {
       email: req.params.email,
       particular: 'get_accommodation_email_error',
-      error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
-    });
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
-};
-
-// Update payment status
-export const updatePaymentStatus = async (req: Request, res: Response) => {
-  try {
-    const { uniqueId } = req.params;
-
-    if (!uniqueId) {
-      logger.warn('Update payment status failed - missing uniqueId', {
-        particular: 'update_payment_status_missing'
-      });
-      return res.status(400).json({
-        success: false,
-        message: 'Unique ID is required'
-      });
-    }
-
-    // Validate request body
-    const validatedData = updatePaymentSchema.parse(req.body);
-
-    logger.info('Updating payment status', {
-      uniqueId,
-      particular: 'update_payment_status',
-      amount: validatedData.amount
-    });
-
-    // Find and update accommodation
-    const updatedAccommodation = await Accommodation.findOneAndUpdate(
-      { uniqueId },
-      {
-        payment: true,
-        amount: validatedData.amount
-      },
-      { new: true }
-    );
-
-    if (!updatedAccommodation) {
-      logger.warn('Update payment status failed - accommodation not found', {
-        uniqueId,
-        particular: 'update_payment_status_not_found'
-      });
-      return res.status(404).json({
-        success: false,
-        message: 'Accommodation not found'
-      });
-    }
-
-    logger.info('Payment status updated successfully', {
-      uniqueId,
-      email: updatedAccommodation.email,
-      particular: 'update_payment_status_success',
-      amount: validatedData.amount
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Payment status updated successfully',
-      data: updatedAccommodation
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      logger.warn('Update payment status validation error', {
-        uniqueId: req.params.uniqueId,
-        particular: 'update_payment_status_validation_error',
-        errors: error.issues
-      });
-      return res.status(400).json({
-        success: false,
-        message: 'Validation error',
-        errors: error.issues
-      });
-    }
-
-    logger.error('Error updating payment status', {
-      uniqueId: req.params.uniqueId,
-      particular: 'update_payment_status_error',
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -311,28 +212,81 @@ export const getAccommodationStats = async (req: Request, res: Response) => {
       particular: 'get_accommodation_stats'
     });
 
-    // 1. Gender Statistics
+    // Total counts
+    const totalAccommodations = await Accommodation.countDocuments();
+    const totalAllocated = await Accommodation.countDocuments({ allocated: true });
+    const totalNotAllocated = await Accommodation.countDocuments({ allocated: false });
+    const totalVacated = await Accommodation.countDocuments({ vacated: true });
+    const totalOccupied = await Accommodation.countDocuments({ vacated: false });
+
+    // Gender statistics (overall)
     const maleStats = await Accommodation.countDocuments({ gender: 'male' });
     const femaleStats = await Accommodation.countDocuments({ gender: 'female' });
+    const otherStats = await Accommodation.countDocuments({ gender: 'other' });
 
-    // 2. Total Count
-    const totalRooms = await Accommodation.countDocuments();
+    // Allocated and occupied (vacated: false) statistics by day
+    const days = ['12', '13', '14', '12 & 13', '13 & 14', '12, 13 & 14'];
+    const dayStats = await Promise.all(
+      days.map(async (day) => {
+        const total = await Accommodation.countDocuments({ day, allocated: true, vacated: false });
+        const male = await Accommodation.countDocuments({ day, gender: 'male', allocated: true, vacated: false });
+        const female = await Accommodation.countDocuments({ day, gender: 'female', allocated: true, vacated: false });
+        const vacated = await Accommodation.countDocuments({ day, allocated: true, vacated: true });
+        const remaining = await Accommodation.countDocuments({ day, allocated: true, vacated: false });
+        const totalAllocated = await Accommodation.countDocuments({ day, allocated: true });
+        return { day, total, male, female, vacated, remaining, totalAllocated };
+      })
+    );
+
+    // Gender breakdown for allocated and occupied
+    const allocatedOccupiedMale = await Accommodation.countDocuments({ gender: 'male', allocated: true, vacated: false });
+    const allocatedOccupiedFemale = await Accommodation.countDocuments({ gender: 'female', allocated: true, vacated: false });
+
+    // Vacated statistics for allocated people
+    const totalAllocatedVacated = await Accommodation.countDocuments({ allocated: true, vacated: true });
+    const totalAllocatedRemaining = await Accommodation.countDocuments({ allocated: true, vacated: false });
+
+    // Status breakdown
+    const allocatedOccupied = await Accommodation.countDocuments({ allocated: true, vacated: false });
+    const allocatedVacated = await Accommodation.countDocuments({ allocated: true, vacated: true });
+    const notAllocatedOccupied = await Accommodation.countDocuments({ allocated: false, vacated: false });
+    const notAllocatedVacated = await Accommodation.countDocuments({ allocated: false, vacated: true });
 
     logger.info('Accommodation statistics fetched successfully', {
       particular: 'get_accommodation_stats_success',
-      totalRooms,
-      maleStats,
-      femaleStats
+      totalAccommodations,
+      totalAllocated
     });
 
     res.status(200).json({
       success: true,
       data: {
+        totalAccommodations,
+        totalAllocated,
+        totalNotAllocated,
+        totalVacated,
+        totalOccupied,
         genderStats: {
-          maleStats,
-          femaleStats
+          male: maleStats,
+          female: femaleStats,
+          other: otherStats
         },
-        totalRooms
+        dayStats,
+        allocatedOccupiedByGender: {
+          male: allocatedOccupiedMale,
+          female: allocatedOccupiedFemale,
+          total: allocatedOccupied
+        },
+        vacatedStats: {
+          totalAllocatedVacated,
+          totalAllocatedRemaining
+        },
+        statusBreakdown: {
+          allocatedOccupied,
+          allocatedVacated,
+          notAllocatedOccupied,
+          notAllocatedVacated
+        }
       }
     });
   } catch (error) {
@@ -348,7 +302,7 @@ export const getAccommodationStats = async (req: Request, res: Response) => {
   }
 };
 
-// Get all accommodations with room details
+// Get all accommodations
 export const getAllAccommodations = async (req: Request, res: Response) => {
   try {
     logger.info('Fetching all accommodations', {
@@ -358,43 +312,121 @@ export const getAllAccommodations = async (req: Request, res: Response) => {
     // Fetch all accommodations
     const accommodations = await Accommodation.find();
 
-    // Enhance accommodations with room data
-    const enhancedAccommodations = await Promise.all(
-      accommodations.map(async (accommodation) => {
-        // Find room where this accommodation's member exists
-        const room = await Room.findOne({
-          $or: [
-            { 'members.uniqueId': accommodation.uniqueId },
-            { 'members.email': accommodation.email }
-          ]
-        });
-
-        return {
-          ...accommodation.toObject(),
-          room: room ? {
-            _id: room._id,
-            RoomName: room.RoomName,
-            gender: room.gender,
-            Capacity: room.Capacity,
-            currentOccupancy: room.members.length
-          } : null
-        };
-      })
-    );
-
     logger.info('All accommodations fetched successfully', {
       particular: 'get_all_accommodations_success',
-      count: enhancedAccommodations.length
+      count: accommodations.length
     });
 
     res.status(200).json({
       success: true,
-      count: enhancedAccommodations.length,
-      data: enhancedAccommodations
+      count: accommodations.length,
+      data: accommodations
     });
   } catch (error) {
     logger.error('Error fetching all accommodations', {
       particular: 'get_all_accommodations_error',
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+// Zod schema for updating accommodation
+const updateAccommodationSchema = z.object({
+  remarks: z.string().optional(),
+  day: z.enum(['12', '13', '14', '12 & 13', '13 & 14', '12, 13 & 14']).optional(),
+  optin: z.boolean().optional(),
+  allocated: z.boolean().optional(),
+  vacated: z.boolean().optional(),
+});
+
+// Update accommodation details
+export const updateAccommodation = async (req: Request, res: Response) => {
+  try {
+    const { uniqueId } = req.params;
+
+    if (!uniqueId) {
+      logger.warn('Update accommodation failed - missing uniqueId', {
+        particular: 'update_accommodation_missing_uniqueid'
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Unique ID is required'
+      });
+    }
+
+    // Validate request body
+    const validatedData = updateAccommodationSchema.parse(req.body);
+
+    logger.info('Attempting to update accommodation', {
+      uniqueId,
+      particular: 'update_accommodation',
+      updates: Object.keys(validatedData)
+    });
+
+    // Find and update accommodation
+    const accommodation = await Accommodation.findOne({ uniqueId });
+
+    if (!accommodation) {
+      logger.warn('Update accommodation failed - not found', {
+        uniqueId,
+        particular: 'update_accommodation_not_found'
+      });
+      return res.status(404).json({
+        success: false,
+        message: 'Accommodation not found'
+      });
+    }
+
+    // Update fields if provided
+    if (validatedData.remarks !== undefined) {
+      accommodation.remarks = validatedData.remarks;
+    }
+    if (validatedData.day !== undefined) {
+      accommodation.day = validatedData.day;
+    }
+    if (validatedData.optin !== undefined) {
+      accommodation.optin = validatedData.optin;
+    }
+    if (validatedData.allocated !== undefined) {
+      accommodation.allocated = validatedData.allocated;
+    }
+    if (validatedData.vacated !== undefined) {
+      accommodation.vacated = validatedData.vacated;
+    }
+
+    await accommodation.save();
+
+    logger.info('Accommodation updated successfully', {
+      uniqueId,
+      particular: 'update_accommodation_success',
+      accommodationId: accommodation._id
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Accommodation updated successfully',
+      data: accommodation
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      logger.warn('Update accommodation validation error', {
+        particular: 'update_accommodation_validation_error',
+        errors: error.issues
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: error.issues
+      });
+    }
+
+    logger.error('Error updating accommodation', {
+      particular: 'update_accommodation_error',
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });

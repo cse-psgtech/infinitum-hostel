@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
-import AddRooms from './pages/AddRooms'
 import AccommodationDetails from './pages/AccommodationDetails'
 import AllAccommodations from './pages/AllAccommodations'
 import RegisterUser from './pages/RegisterUser'
@@ -27,7 +26,6 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
-          <Route path="add-rooms" element={<AddRooms />} />
           <Route path="accommodation-details" element={<AccommodationDetails />} />
           <Route path="all-accommodations" element={<AllAccommodations />} />
           <Route path="register-user" element={<RegisterUser />} />

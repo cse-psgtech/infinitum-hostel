@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerAccommodation, getAccommodationByUniqueId, getAccommodationByEmail, updatePaymentStatus, getAccommodationStats, getAllAccommodations } from '../controllers/accommodation.controller';
+import { registerAccommodation, getAccommodationByUniqueId, getAccommodationByEmail, getAccommodationStats, getAllAccommodations, updateAccommodation } from '../controllers/accommodation.controller';
 
 const router = Router();
 
@@ -12,13 +12,13 @@ router.get('/uniqueId/:uniqueId', getAccommodationByUniqueId);
 // GET /api/accommodation/email/:email
 router.get('/email/:email', getAccommodationByEmail);
 
-// PUT /api/accommodation/payment/:uniqueId
-router.put('/payment/:uniqueId', updatePaymentStatus);
-
 // GET /api/accommodation/stats
 router.get('/stats', getAccommodationStats);
 
 // GET /api/accommodation/all
 router.get('/all', getAllAccommodations);
+
+// PUT /api/accommodation/update/:uniqueId
+router.put('/update/:uniqueId', updateAccommodation);
 
 export default router;

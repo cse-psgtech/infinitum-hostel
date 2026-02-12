@@ -33,19 +33,23 @@ const AccommodationSchema = new Schema({
         type: String,
         required: true,
     },
-    amount: {
-        type: Number,
-        required: true,
+    day: {
+        type: String,
+        enum: ["12", "13", "14", "12 & 13", "13 & 14", "12, 13 & 14"],
     },
-    payment: {
-        type: Boolean,
-        default: false,
+    remarks: {
+        type: String,
+        default: "",
     },
     vacated: {
         type: Boolean,
         default: false,
     },
     optin: {
+        type: Boolean,
+        default: true,
+    },
+    allocated: {
         type: Boolean,
         default: false,
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-hot-toast';
-import { accommodationAPI, roomAPI } from '../api';
+import { accommodationAPI } from '../api';
 import { QRCodeSVG } from 'qrcode.react';
 import { useScanner } from "./ScannerContext";
 
@@ -65,21 +65,11 @@ interface Accommodation {
   city: string;
   phone: string;
   gender: string;
-  amount: number;
-  payment: boolean;
+  day?: string;
+  remarks?: string;
   vacated: boolean;
   optin: boolean;
-}
-
-interface Room {
-  _id: string;
-  RoomName: string;
-  Capacity: number;
-  members: Array<{
-    uniqueId: string;
-    email: string;
-    accommodation: Accommodation | null;
-  }>;
+  allocated: boolean;
 }
 
 const AccommodationDetails: React.FC = () => {
@@ -87,29 +77,11 @@ const AccommodationDetails: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'uniqueId' | 'email'>('uniqueId');
   const [emailValue, setEmailValue] = useState('');
   const [loading, setLoading] = useState(false);
-  const [accommodationData, setAccommodationData] = useState<{
-    accommodation: Accommodation;
-    room: Room | null;
-  } | null>(null);
-  const [roomData, setRoomData] = useState<{
-    room: {
-      _id: string;
-      RoomName: string;
-      Capacity: number;
-      currentOccupancy: number;
-    };
-    member: any;
-  } | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showAllocateModal, setShowAllocateModal] = useState(false);
-  const [showChangeRoomModal, setShowChangeRoomModal] = useState(false);
-  const [paymentAmount, setPaymentAmount] = useState('');
-  const [updatingPayment, setUpdatingPayment] = useState(false);
-  const [allocatingRoom, setAllocatingRoom] = useState(false);
-  const [changingRoom, setChangingRoom] = useState(false);
-  const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
-  const [roomSearchTerm, setRoomSearchTerm] = useState('');
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [accommodationData, setAccommodationData] = useState<Accommodation | null>(null);
+  const [selectedDay, setSelectedDay] = useState<string>('');
+  const [updatingDay, setUpdatingDay] = useState(false);
+  const [updatingAllocated, setUpdatingAllocated] = useState(false);
+  const [updatingVacated, setUpdatingVacated] = useState(false);
 
 
 
@@ -120,7 +92,8 @@ const AccommodationDetails: React.FC = () => {
     setLoading(true);
     try {
       const response = await accommodationAPI.getByUniqueId(`INF${uniqueId}`);
-      setAccommodationData(response.data);
+      setAccommodationData(response.data.accommodation);
+      setSelectedDay(response.data.accommodation.day || '');
       toast.success('Accommodation details loaded successfully');
     } catch (error: any) {
       console.error('Error fetching accommodation:', error);
@@ -141,7 +114,8 @@ const AccommodationDetails: React.FC = () => {
     setLoading(true);
     try {
       const response = await accommodationAPI.getByEmail(emailValue.trim());
-      setAccommodationData(response.data);
+      setAccommodationData(response.data.accommodation);
+      setSelectedDay(response.data.accommodation.day || '');
       toast.success('Accommodation details loaded successfully');
     } catch (error: any) {
       console.error('Error fetching accommodation:', error);
@@ -152,83 +126,96 @@ const AccommodationDetails: React.FC = () => {
     }
   };
 
-  // Fetch room data for the current member
-  const fetchRoomData = async (identifier: string) => {
+  // Update day only (for already allocated accommodations)
+  const handleUpdateDay = async () => {
+    if (!accommodationData || !selectedDay) return;
+
     try {
-      const response = await roomAPI.findRoomByMember(identifier);
-      setRoomData(response.data);
+      setUpdatingDay(true);
+      await accommodationAPI.update(accommodationData.uniqueId, { day: selectedDay });
+      
+      setAccommodationData(prev => prev ? { ...prev, day: selectedDay } : null);
+      toast.success('Accommodation days updated successfully');
     } catch (error: any) {
-      console.error('Error fetching room data:', error);
-      setRoomData(null);
-    }
-  };
-
-  // Fetch available rooms for allocation
-  const fetchAvailableRooms = async () => {
-    try {
-      const response = await roomAPI.getAllRooms();
-      setAvailableRooms(response.data);
-    } catch (error: any) {
-      console.error('Error fetching rooms:', error);
-      toast.error('Failed to load available rooms');
-    }
-  };
-
-  // Allocate room to member
-  const allocateRoom = async () => {
-    if (!selectedRoom || !accommodationData) return;
-
-    setAllocatingRoom(true);
-    try {
-      await roomAPI.addMember({
-        uniqueId: accommodationData.accommodation.uniqueId,
-        email: accommodationData.accommodation.email,
-        roomName: selectedRoom.RoomName
-      });
-
-      toast.success('Room allocated successfully');
-      setShowAllocateModal(false);
-      setSelectedRoom(null);
-      setRoomSearchTerm('');
-
-      // Refresh room data
-      await fetchRoomData(accommodationData.accommodation.uniqueId);
-    } catch (error: any) {
-      console.error('Error allocating room:', error);
-      toast.error(error.message || 'Failed to allocate room');
+      console.error('Error updating day:', error);
+      toast.error(error.message || 'Failed to update accommodation days');
     } finally {
-      setAllocatingRoom(false);
+      setUpdatingDay(false);
     }
   };
 
-  // Change member's room
-  const changeRoom = async () => {
-    if (!selectedRoom || !accommodationData || !roomData) return;
+  // Allocate with selected days (combined action)
+  const handleAllocateWithDays = async () => {
+    if (!accommodationData || !selectedDay) {
+      toast.error('Please select accommodation days first');
+      return;
+    }
 
-    setChangingRoom(true);
     try {
-      await roomAPI.changeRoom({
-        uniqueId: accommodationData.accommodation.uniqueId,
-        email: accommodationData.accommodation.email,
-        fromRoom: roomData.room.RoomName,
-        toRoom: selectedRoom.RoomName
+      setUpdatingAllocated(true);
+      await accommodationAPI.update(accommodationData.uniqueId, { 
+        day: selectedDay,
+        allocated: true 
       });
-
-      toast.success('Room changed successfully');
-      setShowChangeRoomModal(false);
-      setSelectedRoom(null);
-      setRoomSearchTerm('');
-
-      // Refresh room data
-      const identifier = activeTab === 'uniqueId'
-        ? accommodationData.accommodation.uniqueId
-        : accommodationData.accommodation.email;
-      await fetchRoomData(identifier);
+      
+      setAccommodationData(prev => prev ? { ...prev, day: selectedDay, allocated: true } : null);
+      toast.success('Accommodation allocated successfully');
     } catch (error: any) {
-      console.error('Error changing room:', error);
-      toast.error(error.message || 'Failed to change room');
+      console.error('Error allocating accommodation:', error);
+      toast.error(error.message || 'Failed to allocate accommodation');
     } finally {
-      setChangingRoom(false);
+      setUpdatingAllocated(false);
+    }
+  };
+
+  const handleRevertAllocation = async () => {
+    if (!accommodationData) return;
+
+    try {
+      setUpdatingAllocated(true);
+      await accommodationAPI.update(accommodationData.uniqueId, { allocated: false });
+      
+      setAccommodationData(prev => prev ? { ...prev, allocated: false } : null);
+      toast.success('Allocation reverted successfully');
+    } catch (error: any) {
+      console.error('Error reverting allocation:', error);
+      toast.error(error.message || 'Failed to revert allocation');
+    } finally {
+      setUpdatingAllocated(false);
+    }
+  };
+
+  const handleVacate = async () => {
+    if (!accommodationData) return;
+
+    try {
+      setUpdatingVacated(true);
+      await accommodationAPI.update(accommodationData.uniqueId, { vacated: true });
+      
+      setAccommodationData(prev => prev ? { ...prev, vacated: true } : null);
+      toast.success('Marked as vacated successfully');
+    } catch (error: any) {
+      console.error('Error marking as vacated:', error);
+      toast.error(error.message || 'Failed to mark as vacated');
+    } finally {
+      setUpdatingVacated(false);
+    }
+  };
+
+  const handleRevertVacated = async () => {
+    if (!accommodationData) return;
+
+    try {
+      setUpdatingVacated(true);
+      await accommodationAPI.update(accommodationData.uniqueId, { vacated: false });
+      
+      setAccommodationData(prev => prev ? { ...prev, vacated: false } : null);
+      toast.success('Vacated status reverted successfully');
+    } catch (error: any) {
+      console.error('Error reverting vacated status:', error);
+      toast.error(error.message || 'Failed to revert vacated status');
+    } finally {
+      setUpdatingVacated(false);
     }
   };
 
@@ -241,7 +228,7 @@ const AccommodationDetails: React.FC = () => {
     const handleClearScan = () => {
       setUniqueIdValue("");
       setAccommodationData(null);
-      setRoomData(null);
+      setSelectedDay('');
       toast.success("Cleared by scanner");
     };
 
@@ -251,6 +238,7 @@ const AccommodationDetails: React.FC = () => {
       socket.off("clear-scan", handleClearScan);
     };
   }, [socket]);
+  
   // Auto-fetch when unique ID is complete
   useEffect(() => {
     if (uniqueIdValue.length === 4 && activeTab === 'uniqueId') {
@@ -258,81 +246,10 @@ const AccommodationDetails: React.FC = () => {
     }
   }, [uniqueIdValue, activeTab]);
 
-
-
-
-  // Fetch room data when accommodation data changes
-  useEffect(() => {
-    if (accommodationData) {
-      const identifier = activeTab === 'uniqueId'
-        ? accommodationData.accommodation.uniqueId
-        : accommodationData.accommodation.email;
-      fetchRoomData(identifier);
-    } else {
-      setRoomData(null);
-    }
-  }, [accommodationData, activeTab]);
-
-  // Fetch available rooms when allocate modal opens
-  useEffect(() => {
-    if (showAllocateModal) {
-      fetchAvailableRooms();
-    }
-  }, [showAllocateModal]);
-
-  // Fetch available rooms when change room modal opens
-  useEffect(() => {
-    if (showChangeRoomModal) {
-      fetchAvailableRooms();
-    }
-  }, [showChangeRoomModal]);
-
-  // Update payment status
-  const updatePayment = async () => {
-    if (!accommodationData) return;
-
-    const amount = parseFloat(paymentAmount);
-    if (!amount || amount <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
-
-    setUpdatingPayment(true);
-    try {
-      await accommodationAPI.updatePayment(accommodationData.accommodation.uniqueId, amount);
-
-      // Update local state
-      setAccommodationData({
-        ...accommodationData,
-        accommodation: {
-          ...accommodationData.accommodation,
-          payment: true,
-          amount: amount
-        }
-      });
-
-      toast.success('Payment status updated successfully');
-      setShowPaymentModal(false);
-      setPaymentAmount('');
-    } catch (error: any) {
-      console.error('Error updating payment:', error);
-      toast.error(error.message || 'Failed to update payment status');
-    } finally {
-      setUpdatingPayment(false);
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR'
-    }).format(amount);
-  };
-
   const clearScan = () => {
     setUniqueIdValue("");
     setAccommodationData(null);
-    setRoomData(null);
+    setSelectedDay('');
 
     if (socket && scannerMode) {
       socket.emit("clear-scan");
@@ -519,17 +436,9 @@ const AccommodationDetails: React.FC = () => {
           <div className="bg-gray-900/60 backdrop-blur-xl rounded-xl shadow-2xl border border-purple-500/30 overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600/40 to-pink-600/40 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-white">{accommodationData.accommodation.name}</h2>
-                  <p className="text-purple-100">ID: {accommodationData.accommodation.uniqueId}</p>
-                </div>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${accommodationData.accommodation.payment
-                  ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                  : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}>
-                  {accommodationData.accommodation.payment ? 'Paid' : 'Unpaid'}
-                </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">{accommodationData.name}</h2>
+                <p className="text-purple-100">ID: {accommodationData.uniqueId}</p>
               </div>
             </div>
 
@@ -546,19 +455,25 @@ const AccommodationDetails: React.FC = () => {
                     <div className="space-y-3">
                       <div>
                         <label className="block text-sm font-medium text-gray-400">Email</label>
-                        <p className="text-white">{accommodationData.accommodation.email}</p>
+                        <p className="text-white">{accommodationData.email}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-400">Phone</label>
-                        <p className="text-white">{accommodationData.accommodation.phone}</p>
+                        <p className="text-white">{accommodationData.phone}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-400">Gender</label>
-                        <p className="text-white capitalize">{accommodationData.accommodation.gender}</p>
+                        <p className="text-white capitalize">{accommodationData.gender}</p>
                       </div>
+                      {accommodationData.day && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-400">Accommodation Days</label>
+                          <p className="text-white">Feb {accommodationData.day}</p>
+                        </div>
+                      )}
                       <div>
                         <label className="block text-sm font-medium text-gray-400">College</label>
-                        <p className="text-white">{accommodationData.accommodation.college}</p>
+                        <p className="text-white">{accommodationData.college}</p>
                       </div>
                     </div>
                   </div>
@@ -572,7 +487,7 @@ const AccommodationDetails: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          checked={accommodationData.accommodation.optin}
+                          checked={accommodationData.optin}
                           readOnly
                           className="rounded border-purple-500/30 text-purple-500 focus:ring-purple-500"
                         />
@@ -581,7 +496,7 @@ const AccommodationDetails: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         <input
                           type="checkbox"
-                          checked={!accommodationData.accommodation.vacated}
+                          checked={!accommodationData.vacated}
                           readOnly
                           className="rounded border-purple-500/30 text-purple-500 focus:ring-purple-500"
                         />
@@ -591,128 +506,153 @@ const AccommodationDetails: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Right Column - Payment Section */}
+                {/* Right Column - Day Selection, Remarks & Actions */}
                 <div className="space-y-6">
-                  {/* Payment Section */}
+                  {/* Remarks Section */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-purple-500/20 pb-2">
-                      Payment Information
+                      Remarks
                     </h3>
-                    <div className="space-y-4">
-                      {accommodationData.accommodation.payment ? (
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-400">Payment Status</label>
-                            <div className="flex items-center space-x-3">
-                              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/20 text-green-300 border border-green-500/30">
-                                Paid
-                              </span>
-                              <button
-                                onClick={() => setShowPaymentModal(true)}
-                                className="text-purple-400 hover:text-pink-400 text-sm font-medium underline transition-colors"
-                              >
-                                Edit Amount
-                              </button>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-400">Amount Paid</label>
-                            <p className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-300">
-                              {formatCurrency(accommodationData.accommodation.amount)}
-                            </p>
-                          </div>
-                        </div>
+                    <div className="p-4 bg-gray-800/50 rounded-lg border border-purple-500/20">
+                      {accommodationData.remarks ? (
+                        <p className="text-gray-300 italic">"{accommodationData.remarks}"</p>
                       ) : (
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-400">Payment Status</label>
-                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/20 text-red-300 border border-red-500/30">
-                              Unpaid
-                            </span>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-white mb-2">
-                              Enter Payment Amount (₹)
-                            </label>
-                            <div className="flex space-x-3">
-                              <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={paymentAmount}
-                                onChange={(e) => setPaymentAmount(e.target.value)}
-                                className="flex-1 px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
-                                placeholder="Enter amount"
-                              />
-                              <button
-                                onClick={updatePayment}
-                                disabled={updatingPayment || !paymentAmount}
-                                className="relative px-4 py-3 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
-                              >
-                                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 transition-all duration-300 group-hover:scale-105"></div>
-                                <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                                <div className="relative flex items-center">{updatingPayment && (
-                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                )}
-                                  {updatingPayment ? 'Updating...' : 'Pay Now'}</div>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        <p className="text-gray-500 italic">No remarks added</p>
                       )}
                     </div>
                   </div>
 
-                  {/* Room Information */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] border-b border-[rgba(67,2,105,0.3)] pb-2">
-                      Room Information
-                    </h3>
-                    <div className="space-y-3">
-                      {roomData ? (
-                        <>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-400">Room Name</label>
-                            <p className="text-white">{roomData.room.RoomName}</p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-400">Capacity</label>
-                            <p className="text-white">{roomData.room.Capacity}</p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-400">Current Occupancy</label>
-                            <p className="text-white">{roomData.room.currentOccupancy}/{roomData.room.Capacity}</p>
-                          </div>
-                          <div className="pt-2 flex items-center justify-between">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
-                              Room Allocated
-                            </span>
-                            <button
-                              onClick={() => setShowChangeRoomModal(true)}
-                              className="text-purple-400 hover:text-pink-400 text-sm font-medium underline transition-colors"
-                            >
-                              Change Room
-                            </button>
-                          </div>
-                        </>
-                      ) : (
+                  {!accommodationData.allocated ? (
+                    /* Day Selection & Allocation (Combined for unallocated) */
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-purple-500/20 pb-2">
+                        Select Days & Allocate
+                      </h3>
+                      <div className="space-y-2">
+                        {['12', '13', '14', '12 & 13', '13 & 14', '12, 13 & 14'].map((day) => (
+                          <label key={day} className="flex items-center space-x-3 cursor-pointer p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-all">
+                            <input
+                              type="radio"
+                              name="day"
+                              value={day}
+                              checked={selectedDay === day}
+                              onChange={(e) => setSelectedDay(e.target.value)}
+                              className="w-4 h-4 text-purple-500 focus:ring-purple-500 border-gray-500"
+                            />
+                            <span className="text-white">Feb {day}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <button
+                        onClick={handleAllocateWithDays}
+                        disabled={updatingAllocated || !selectedDay}
+                        className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-500 hover:to-green-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      >
+                        {updatingAllocated && (
+                          <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                        )}
+                        <span>{updatingAllocated ? 'Allocating...' : 'Allocate with Selected Days'}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    /* Allocated - Show status and update controls */
+                    <>
+                      {/* Allocation Status */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-purple-500/20 pb-2">
+                          Allocation Status
+                        </h3>
                         <div className="space-y-3">
-                          <p className="text-gray-400">No room allocated</p>
+                          <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center space-x-2">
+                            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-green-300">Accommodation allocated</span>
+                          </div>
                           <button
-                            onClick={() => setShowAllocateModal(true)}
-                            className="relative w-full overflow-hidden rounded-xl text-white px-4 py-3 font-medium transition-all duration-200 group"
+                            onClick={handleRevertAllocation}
+                            disabled={updatingAllocated}
+                            className="w-full px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-500 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                           >
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#430269] to-[#F21961] transition-all duration-300 group-hover:scale-105"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#5c0388] to-[#ff2a72] opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                            <span className="relative">Allocate Room</span>
+                            {updatingAllocated && (
+                              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                            )}
+                            <span>{updatingAllocated ? 'Reverting...' : 'Revert Allocation'}</span>
                           </button>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+
+                      {/* Day Update (Only for allocated) */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-purple-500/20 pb-2">
+                          Update Accommodation Days
+                        </h3>
+                        <div className="space-y-2">
+                          {['12', '13', '14', '12 & 13', '13 & 14', '12, 13 & 14'].map((day) => (
+                            <label key={day} className="flex items-center space-x-3 cursor-pointer p-3 bg-gray-800/30 rounded-lg hover:bg-gray-800/50 transition-all">
+                              <input
+                                type="radio"
+                                name="day"
+                                value={day}
+                                checked={selectedDay === day}
+                                onChange={(e) => setSelectedDay(e.target.value)}
+                                className="w-4 h-4 text-purple-500 focus:ring-purple-500 border-gray-500"
+                              />
+                              <span className="text-white">Feb {day}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <button
+                          onClick={handleUpdateDay}
+                          disabled={updatingDay || !selectedDay || selectedDay === accommodationData.day}
+                          className="w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-500 hover:to-pink-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                        >
+                          {updatingDay && (
+                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                          )}
+                          <span>{updatingDay ? 'Updating...' : 'Update Days'}</span>
+                        </button>
+                      </div>
+
+                      {/* Vacate Section (Only for allocated) */}
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300 border-b border-purple-500/20 pb-2">
+                          Vacancy Status
+                        </h3>
+                        {accommodationData.vacated ? (
+                          <div className="space-y-3">
+                            <div className="p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg flex items-center space-x-2">
+                              <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                              </svg>
+                              <span className="text-orange-300">Accommodation vacated</span>
+                            </div>
+                            <button
+                              onClick={handleRevertVacated}
+                              disabled={updatingVacated}
+                              className="w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-500 hover:to-blue-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                            >
+                              {updatingVacated && (
+                                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                              )}
+                              <span>{updatingVacated ? 'Reverting...' : 'Revert Vacated Status'}</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={handleVacate}
+                            disabled={updatingVacated}
+                            className="w-full px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:from-orange-500 hover:to-orange-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                          >
+                            {updatingVacated && (
+                              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                            )}
+                            <span>{updatingVacated ? 'Marking...' : 'Mark as Vacated'}</span>
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -725,264 +665,14 @@ const AccommodationDetails: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-400">Residential Address</label>
-                      <p className="text-white">{accommodationData.accommodation.residentialAddress}</p>
+                      <p className="text-white">{accommodationData.residentialAddress}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-400">City</label>
-                      <p className="text-white">{accommodationData.accommodation.city}</p>
+                      <p className="text-white">{accommodationData.city}</p>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Update Modal */}
-        {showPaymentModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(67,2,105,0.3)]">
-              <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] mb-4">
-                {accommodationData?.accommodation.payment ? 'Edit Payment Amount' : 'Update Payment Status'}
-              </h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">
-                    Payment Amount (₹)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    className="w-full px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
-                    placeholder="Enter payment amount"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowPaymentModal(false);
-                    setPaymentAmount('');
-                  }}
-                  className="px-4 py-2 text-gray-300 border border-[rgba(67,2,105,0.4)] rounded-xl hover:bg-gray-800/50 transition-all duration-200"
-                  disabled={updatingPayment}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={updatePayment}
-                  disabled={updatingPayment}
-                  className="relative px-4 py-2 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 transition-all duration-300 group-hover:scale-105"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                  <div className="relative flex items-center">{updatingPayment && (
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  )}
-                    {updatingPayment ? 'Updating...' : (accommodationData?.accommodation.payment ? 'Update Amount' : 'Mark as Paid')}</div>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Change Room Modal */}
-        {showChangeRoomModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(67,2,105,0.3)]">
-              <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] mb-4">Change Room</h2>
-
-              <div className="space-y-4">
-                {/* Room Search */}
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">
-                    Search Rooms
-                  </label>
-                  <input
-                    type="text"
-                    value={roomSearchTerm}
-                    onChange={(e) => setRoomSearchTerm(e.target.value)}
-                    placeholder="Search by room name..."
-                    className="w-full px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
-                  />
-                </div>
-
-                {/* Room Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">
-                    Select New Room
-                  </label>
-                  <div className="max-h-48 overflow-y-auto border border-[rgba(67,2,105,0.4)] rounded-xl bg-gray-800/30">
-                    {availableRooms
-                      .filter(room =>
-                        room.RoomName.toLowerCase().includes(roomSearchTerm.toLowerCase()) &&
-                        room._id !== roomData?.room._id // Exclude current room
-                      )
-                      .map((room) => (
-                        <div
-                          key={room._id}
-                          onClick={() => setSelectedRoom(room)}
-                          className={`p-3 cursor-pointer border-b border-[rgba(67,2,105,0.2)] last:border-b-0 hover:bg-purple-500/10 transition-colors ${selectedRoom?._id === room._id ? 'bg-purple-500/20 border-purple-500/50' : ''
-                            }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="font-medium text-white">{room.RoomName}</p>
-                              <p className="text-sm text-gray-400">
-                                Capacity: {room.Capacity} | Occupied: {room.members.length}
-                              </p>
-                            </div>
-                            {room.members.length >= room.Capacity && (
-                              <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded border border-red-500/30">
-                                Full
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    {availableRooms.filter(room =>
-                      room.RoomName.toLowerCase().includes(roomSearchTerm.toLowerCase()) &&
-                      room._id !== roomData?.room._id
-                    ).length === 0 && (
-                        <div className="p-3 text-center text-gray-400">
-                          No other rooms available
-                        </div>
-                      )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowChangeRoomModal(false);
-                    setSelectedRoom(null);
-                    setRoomSearchTerm('');
-                  }}
-                  className="px-4 py-2 text-gray-300 border border-[rgba(67,2,105,0.4)] rounded-xl hover:bg-gray-800/50 transition-all duration-200"
-                  disabled={changingRoom}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={changeRoom}
-                  disabled={changingRoom || !selectedRoom}
-                  className="relative px-4 py-2 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-700 transition-all duration-300 group-hover:scale-105"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-orange-700 to-orange-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                  <div className="relative flex items-center">{changingRoom && (
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  )}
-                    {changingRoom ? 'Changing...' : 'Change Room'}</div>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Allocate Room Modal */}
-        {showAllocateModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-gray-900/90 backdrop-blur-xl rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-[rgba(67,2,105,0.3)]">
-              <h2 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#f0e6ff] to-[#ff6b9d] mb-4">Allocate Room</h2>
-
-              <div className="space-y-4">
-                {/* Room Search */}
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">
-                    Search Rooms
-                  </label>
-                  <input
-                    type="text"
-                    value={roomSearchTerm}
-                    onChange={(e) => setRoomSearchTerm(e.target.value)}
-                    placeholder="Search by room name..."
-                    className="w-full px-3 py-3 border border-[rgba(67,2,105,0.4)] rounded-xl placeholder-gray-500 bg-gray-800/50 text-white focus:outline-none focus:ring-2 focus:ring-[#430269] focus:border-transparent transition-all duration-200 hover:border-[rgba(67,2,105,0.6)]"
-                  />
-                </div>
-
-                {/* Room Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-white mb-1">
-                    Select Room
-                  </label>
-                  <div className="max-h-48 overflow-y-auto border border-[rgba(67,2,105,0.4)] rounded-xl bg-gray-800/30">
-                    {availableRooms
-                      .filter(room =>
-                        room.RoomName.toLowerCase().includes(roomSearchTerm.toLowerCase())
-                      )
-                      .map((room) => (
-                        <div
-                          key={room._id}
-                          onClick={() => setSelectedRoom(room)}
-                          className={`p-3 cursor-pointer border-b border-[rgba(67,2,105,0.2)] last:border-b-0 hover:bg-purple-500/10 transition-colors ${selectedRoom?._id === room._id ? 'bg-purple-500/20 border-purple-500/50' : ''
-                            }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <p className="font-medium text-white">{room.RoomName}</p>
-                              <p className="text-sm text-gray-400">
-                                Capacity: {room.Capacity} | Occupied: {room.members.length}
-                              </p>
-                            </div>
-                            {room.members.length >= room.Capacity && (
-                              <span className="text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded border border-red-500/30">
-                                Full
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    {availableRooms.filter(room =>
-                      room.RoomName.toLowerCase().includes(roomSearchTerm.toLowerCase())
-                    ).length === 0 && (
-                        <div className="p-3 text-center text-gray-400">
-                          No rooms found
-                        </div>
-                      )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowAllocateModal(false);
-                    setSelectedRoom(null);
-                    setRoomSearchTerm('');
-                  }}
-                  className="px-4 py-2 text-gray-300 border border-[rgba(67,2,105,0.4)] rounded-xl hover:bg-gray-800/50 transition-all duration-200"
-                  disabled={allocatingRoom}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={allocateRoom}
-                  disabled={allocatingRoom || !selectedRoom}
-                  className="relative px-4 py-2 overflow-hidden rounded-xl text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 transition-all duration-300 group-hover:scale-105"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-700 to-green-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur"></div>
-                  <div className="relative flex items-center">{allocatingRoom && (
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  )}
-                    {allocatingRoom ? 'Allocating...' : 'Allocate Room'}</div>
-                </button>
               </div>
             </div>
           </div>

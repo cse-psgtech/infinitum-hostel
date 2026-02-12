@@ -4,7 +4,6 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import { connectDB } from './config/database';
-import roomRoutes from './routes/room.routes';
 import accommodationRoutes from './routes/accommodation.routes';
 import deskRoutes from './routes/desk.routes';
 import userRoutes from './routes/user.routes';
@@ -82,7 +81,6 @@ app.get('/inf/api/acc', (req, res) => {
   res.send('Hotel server is running with /api/acc');
 });
 
-app.use('/inf/api/acc/rooms', roomRoutes);
 app.use('/inf/api/acc/accommodation', accommodationRoutes);
 app.use('/inf/api/acc/desk', deskRoutes);
 app.use('/inf/api/acc/user', userRoutes);
