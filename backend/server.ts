@@ -7,6 +7,7 @@ import { connectDB } from './config/database';
 import roomRoutes from './routes/room.routes';
 import accommodationRoutes from './routes/accommodation.routes';
 import deskRoutes from './routes/desk.routes';
+import userRoutes from './routes/user.routes';
 import { initializeSocket } from './utils/socket';
 import logger from './utils/logger';
 
@@ -84,6 +85,7 @@ app.get('/inf/api/acc', (req, res) => {
 app.use('/inf/api/acc/rooms', roomRoutes);
 app.use('/inf/api/acc/accommodation', accommodationRoutes);
 app.use('/inf/api/acc/desk', deskRoutes);
+app.use('/inf/api/acc/user', userRoutes);
 
 // Start server
 httpServer.listen(PORT, () => {

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import AddRooms from './pages/AddRooms'
 import AccommodationDetails from './pages/AccommodationDetails'
 import AllAccommodations from './pages/AllAccommodations'
+import RegisterUser from './pages/RegisterUser'
 import Scanner from './pages/Scanner'
 import ProtectedRoute from './components/ProtectedRoute'
 import Test from './pages/Test'
@@ -29,6 +30,7 @@ function App() {
           <Route path="add-rooms" element={<AddRooms />} />
           <Route path="accommodation-details" element={<AccommodationDetails />} />
           <Route path="all-accommodations" element={<AllAccommodations />} />
+          <Route path="register-user" element={<RegisterUser />} />
         </Route>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

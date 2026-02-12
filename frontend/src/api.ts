@@ -142,9 +142,18 @@ export const deskAPI = {
   },
 };
 
+// User API functions
+export const userAPI = {
+  // Get all users
+  getAllUsers: async () => {
+    return apiRequest('/user/fetch');
+  },
+};
+
 // Export default API configuration
 export default {
   roomAPI,
   accommodationAPI,
   deskAPI,
+  userAPI,
 };

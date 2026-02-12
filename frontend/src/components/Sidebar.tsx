@@ -16,6 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     { name: 'Rooms', href: '/home/add-rooms' },
     { name: 'Search Members', href: '/home/accommodation-details' },
     { name: 'All Accommodations', href: '/home/all-accommodations' },
+    { name: 'Register User', href: '/home/register-user' },
   ];
 
   const handleLogout = () => {
